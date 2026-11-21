@@ -4,11 +4,11 @@
 Develop on macOS Apple Silicon (M4). Use a pinned Node.js LTS version, pnpm workspaces, TypeScript strict mode, and one lockfile.
 
 ## Repository boundaries
-- `apps/web`: TanStack Start application, client UI, and server/BFF code.
-- `services/collector`: standalone Tilt BLE listener.
-- `services/store`: standalone Fastify API and sole SQLite owner.
-- `packages/contracts`: runtime schemas and DTOs.
-- `packages/domain`: framework-independent domain logic.
+- `src/apps/web`: TanStack Start application, client UI, and server/BFF code.
+- `src/services/collector`: standalone Tilt BLE listener.
+- `src/services/store`: standalone Fastify API and sole SQLite owner.
+- `src/packages/contracts`: runtime schemas and DTOs.
+- `src/packages/domain`: framework-independent domain logic.
 
 ## Local process workflow
 1. Run Store with a local development SQLite database.

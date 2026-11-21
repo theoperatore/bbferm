@@ -18,7 +18,7 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.2(postcss@8.5.33))(terser@5.51.4)(tsx@4.23.15))
 
-  apps/web:
+  src/apps/web:
     dependencies:
       '@bbferm/contracts':
         specifier: workspace:*
@@ -88,9 +88,9 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(@vite-pwa/assets-generator@2.0.0(@types/node@24.19.2))(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.2(postcss@8.5.33))(terser@5.51.4)(tsx@4.23.15))(workbox-build@7.4.1)(workbox-window@7.4.1)
 
-  packages/config: {}
+  src/packages/config: {}
 
-  packages/contracts:
+  src/packages/contracts:
     dependencies:
       zod:
         specifier: ^4.6.7
@@ -100,13 +100,13 @@ importers:
         specifier: workspace:*
         version: link:../config
 
-  packages/domain:
+  src/packages/domain:
     devDependencies:
       '@bbferm/config':
         specifier: workspace:*
         version: link:../config
 
-  services/collector:
+  src/services/collector:
     dependencies:
       '@bbferm/contracts':
         specifier: workspace:*
@@ -125,7 +125,7 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
-  services/store:
+  src/services/store:
     dependencies:
       '@bbferm/contracts':
         specifier: workspace:*

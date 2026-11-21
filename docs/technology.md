@@ -33,7 +33,7 @@ Standalone Node.js/TypeScript process. Listens for Tilt BLE advertisements throu
 Standalone Fastify service. Owns SQLite, migrations, transactions, and persistence DTOs. It is the only process allowed to open the database.
 
 ### Shared packages
-Use pnpm workspaces. Put runtime validation schemas and API DTOs in a shared `packages/contracts` package. Keep domain logic framework-independent where practical.
+Use pnpm workspaces. Put runtime validation schemas and API DTOs in a shared `src/packages/contracts` package. Keep domain logic framework-independent where practical.
 
 ## Suggested monorepo
 
@@ -43,15 +43,16 @@ bbferm/
 ├── docs/
 ├── package.json
 ├── pnpm-workspace.yaml
-├── apps/
-│   └── web/                 # TanStack Start: SPA + BFF
-├── services/
-│   ├── collector/           # standalone BLE listener
-│   └── store/               # Fastify + SQLite
-├── packages/
-│   ├── contracts/           # runtime schemas and DTOs
-│   ├── domain/              # shared domain logic
-│   └── config/
+├── src/
+│   ├── apps/
+│   │   └── web/             # TanStack Start: SPA + BFF
+│   ├── services/
+│   │   ├── collector/       # standalone BLE listener
+│   │   └── store/           # Fastify + SQLite
+│   └── packages/
+│       ├── contracts/       # runtime schemas and DTOs
+│       ├── domain/          # shared domain logic
+│       └── config/
 └── scripts/
     ├── build-release.sh
     ├── deploy-release.sh

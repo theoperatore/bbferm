@@ -1,7 +1,7 @@
 packages:
-  - apps/*
-  - services/*
-  - packages/*
+  - src/apps/*
+  - src/services/*
+  - src/packages/*
 
 onlyBuiltDependencies:
   - esbuild

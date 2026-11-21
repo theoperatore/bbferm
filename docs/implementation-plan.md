@@ -1,7 +1,7 @@
 # Implementation plan
 
 ## Milestone 1: TanStack Start + PWA proof of concept
-- Create pnpm workspace and `apps/web` TanStack Start app.
+- Create pnpm workspace and `src/apps/web` TanStack Start app.
 - Configure SPA mode; SSR is not a requirement.
 - Add Mantine and TanStack Query.
 - Add a server-only Store client with runtime validation.
