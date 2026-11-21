@@ -65,6 +65,37 @@ The browser talks only to TanStack Start. Start and the collector talk to Store 
 
 Cloud synchronization, remote access, Docker, and automated CI/CD are also out of the initial release scope.
 
+## Getting started
+
+Requires Node.js 24 (`.nvmrc`) and pnpm 10.
+
+```sh
+pnpm install
+cp services/store/.env.example services/store/.env
+cp services/collector/.env.example services/collector/.env
+cp apps/web/.env.example apps/web/.env
+
+pnpm dev:store       # Fastify Store on 127.0.0.1:3100 (in-memory until the SQLite driver is chosen)
+pnpm dev:collector   # replays captured Tilt advertisements into Store
+pnpm dev:web         # TanStack Start on 127.0.0.1:3000
+```
+
+```sh
+pnpm typecheck && pnpm test && pnpm build
+pnpm --filter @bbferm/web start   # serve the production web build (PWA + BFF)
+```
+
+| Path | Package | Purpose |
+| --- | --- | --- |
+| `apps/web` | `@bbferm/web` | TanStack Start SPA + BFF, Mantine, TanStack Query, PWA |
+| `services/store` | `@bbferm/store` | Fastify internal API (`/internal/v1`), sole SQLite owner |
+| `services/collector` | `@bbferm/collector` | Tilt BLE listener (decoder, replay source, Store submitter) |
+| `packages/contracts` | `@bbferm/contracts` | Zod schemas and DTOs shared across boundaries |
+| `packages/domain` | `@bbferm/domain` | Framework-independent brewing logic |
+| `packages/config` | `@bbferm/config` | Shared TypeScript presets |
+
+Workspace packages export TypeScript source under the `@bbferm/source` condition (used by Vite and `tsx` in dev) and compiled `dist/` otherwise (used by the built services).
+
 ## Documentation
 
 - [Architecture and service boundaries](docs/architecture.md)

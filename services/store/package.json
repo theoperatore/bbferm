@@ -1,0 +1,23 @@
+{
+  "name": "@bbferm/store",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "BBFerm persistence API — sole owner of SQLite",
+  "scripts": {
+    "dev": "tsx watch --conditions=@bbferm/source --env-file-if-exists=.env src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bbferm/contracts": "workspace:*",
+    "fastify": "^5.12.8",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@bbferm/config": "workspace:*",
+    "tsx": "^4.23.15"
+  }
+}

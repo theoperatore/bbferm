@@ -1,0 +1,11 @@
+import { describe, expect, it } from 'vitest'
+import { Id } from '@bbferm/contracts'
+import { tiltDeviceId } from '../src/device-id.js'
+
+describe('tiltDeviceId', () => {
+  it('is a stable, valid UUID per color', () => {
+    expect(tiltDeviceId('black')).toBe(tiltDeviceId('black'))
+    expect(tiltDeviceId('black')).not.toBe(tiltDeviceId('red'))
+    expect(Id.safeParse(tiltDeviceId('black')).success).toBe(true)
+  })
+})
