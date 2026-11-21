@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import type { MeasurementIngest, QualityFlag } from '@bbferm/contracts'
-import { fahrenheitToCelsius } from '@bbferm/domain'
+import { type QualityFlag, fahrenheitToCelsius } from '@bbferm/domain'
+import type { MeasurementIngestRequest } from '@bbferm/store-contract'
 import { loadConfig } from './config.js'
 import { tiltDeviceId } from './device-id.js'
 import { createLogger } from './log.js'
@@ -38,7 +38,7 @@ await source.start((ad) => {
   if (reading.gravity < 0.98 || reading.gravity > 1.15) qualityFlags.push('gravity_out_of_range')
   if (reading.temperatureF < 25 || reading.temperatureF > 120) qualityFlags.push('temperature_out_of_range')
 
-  const measurement: MeasurementIngest = {
+  const measurement: MeasurementIngestRequest = {
     id: randomUUID(),
     deviceId: tiltDeviceId(reading.color),
     source: 'tilt',

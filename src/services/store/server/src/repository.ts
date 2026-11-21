@@ -1,4 +1,4 @@
-import type { Measurement, MeasurementIngest } from '@bbferm/contracts'
+import type { MeasurementIngestRequest, StoreMeasurement } from '@bbferm/store-contract'
 
 /**
  * Persistence boundary. The in-memory implementation is a stand-in until the
@@ -6,14 +6,14 @@ import type { Measurement, MeasurementIngest } from '@bbferm/contracts'
  */
 export interface MeasurementRepository {
   /** Returns `created: false` if the ID was already recorded. */
-  ingest(m: MeasurementIngest): Promise<{ created: boolean }>
-  latest(): Promise<Measurement[]>
+  ingest(m: MeasurementIngestRequest): Promise<{ created: boolean }>
+  latest(): Promise<StoreMeasurement[]>
 }
 
 export class InMemoryMeasurementRepository implements MeasurementRepository {
-  readonly #byId = new Map<string, Measurement>()
+  readonly #byId = new Map<string, StoreMeasurement>()
 
-  async ingest(m: MeasurementIngest): Promise<{ created: boolean }> {
+  async ingest(m: MeasurementIngestRequest): Promise<{ created: boolean }> {
     if (this.#byId.has(m.id)) return { created: false }
     this.#byId.set(m.id, {
       id: m.id,
@@ -32,8 +32,8 @@ export class InMemoryMeasurementRepository implements MeasurementRepository {
     return { created: true }
   }
 
-  async latest(): Promise<Measurement[]> {
-    const latestByDevice = new Map<string, Measurement>()
+  async latest(): Promise<StoreMeasurement[]> {
+    const latestByDevice = new Map<string, StoreMeasurement>()
     for (const m of this.#byId.values()) {
       const key = m.deviceId ?? 'manual'
       const prev = latestByDevice.get(key)

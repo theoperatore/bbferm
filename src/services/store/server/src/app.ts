@@ -1,15 +1,16 @@
 import { timingSafeEqual } from 'node:crypto'
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify'
 import {
-  type ErrorCode,
-  type ErrorEnvelope,
-  type HealthResponse,
   type LatestMeasurementsResponse,
-  MeasurementIngest,
+  MeasurementIngestRequest,
   type MeasurementIngestResponse,
   STORE_API_PREFIX,
+  type StoreErrorCode,
+  type StoreErrorEnvelope,
+  type StoreHealthResponse,
   type StoreStatusResponse,
-} from '@bbferm/contracts'
+  storeRoutes,
+} from '@bbferm/store-contract'
 import type { StoreConfig } from './config.js'
 import type { MeasurementRepository } from './repository.js'
 
@@ -27,8 +28,8 @@ export interface AppDeps {
   version?: string
 }
 
-function sendError(reply: FastifyReply, status: number, code: ErrorCode, message: string) {
-  const body: ErrorEnvelope = { error: { code, message, requestId: reply.request.id } }
+function sendError(reply: FastifyReply, status: number, code: StoreErrorCode, message: string) {
+  const body: StoreErrorEnvelope = { error: { code, message, requestId: reply.request.id } }
   return reply.code(status).send(body)
 }
 
@@ -43,7 +44,7 @@ export function buildApp({ config, measurements, version = '0.0.0' }: AppDeps) {
 
   // Service-credential authentication. Health is unauthenticated for probes.
   app.addHook('onRequest', async (req: FastifyRequest, reply: FastifyReply) => {
-    if (req.url === `${STORE_API_PREFIX}/health`) return
+    if (req.url === storeRoutes.health) return
     const header = req.headers.authorization ?? ''
     const token = header.startsWith('Bearer ') ? header.slice(7) : ''
     if (tokenMatches(token, config.STORE_WEB_TOKEN)) req.caller = 'web'
@@ -54,7 +55,7 @@ export function buildApp({ config, measurements, version = '0.0.0' }: AppDeps) {
   const requireCaller = (...allowed: Caller[]) =>
     async (req: FastifyRequest, reply: FastifyReply) => {
       if (!req.caller || !allowed.includes(req.caller)) {
-        return sendError(reply, 403, 'UNAUTHORIZED', 'Caller is not permitted for this operation.')
+        return sendError(reply, 403, 'FORBIDDEN', 'Caller is not permitted for this operation.')
       }
     }
 
@@ -67,9 +68,8 @@ export function buildApp({ config, measurements, version = '0.0.0' }: AppDeps) {
 
   app.register(
     async (api) => {
-      api.get('/health', async (): Promise<HealthResponse> => ({
+      api.get('/health', async (): Promise<StoreHealthResponse> => ({
         status: 'ok',
-        service: 'store',
         version,
         time: new Date().toISOString(),
       }))
@@ -80,7 +80,7 @@ export function buildApp({ config, measurements, version = '0.0.0' }: AppDeps) {
       }))
 
       api.post('/measurements', { preHandler: requireCaller('collector') }, async (req, reply) => {
-        const parsed = MeasurementIngest.safeParse(req.body)
+        const parsed = MeasurementIngestRequest.safeParse(req.body)
         if (!parsed.success) return sendError(reply, 400, 'VALIDATION_ERROR', 'The request is invalid.')
         const { created } = await measurements.ingest(parsed.data)
         const body: MeasurementIngestResponse = { id: parsed.data.id, created }

@@ -12,8 +12,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bbferm/contracts": "workspace:*",
     "@bbferm/domain": "workspace:*",
+    "@bbferm/store-contract": "workspace:*",
     "zod": "^4.6.7"
   },
   "devDependencies": {

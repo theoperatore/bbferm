@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import type { HealthResponse } from '@bbferm/contracts'
+import type { WebHealthResponse } from '../../server/health.schemas'
 
 export const Route = createFileRoute('/api/health')({
   server: {
     handlers: {
       GET: async () => {
-        const body: HealthResponse = {
+        const body: WebHealthResponse = {
           status: 'ok',
-          service: 'web',
           version: '0.0.0',
           time: new Date().toISOString(),
         }

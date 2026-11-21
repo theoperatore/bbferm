@@ -20,12 +20,12 @@ importers:
 
   src/apps/web:
     dependencies:
-      '@bbferm/contracts':
-        specifier: workspace:*
-        version: link:../../packages/contracts
       '@bbferm/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@bbferm/store-contract':
+        specifier: workspace:*
+        version: link:../../services/store/contract
       '@mantine/core':
         specifier: ^9.8.2
         version: 9.8.2(@mantine/hooks@9.8.2(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -90,7 +90,7 @@ importers:
 
   src/packages/config: {}
 
-  src/packages/contracts:
+  src/packages/domain:
     dependencies:
       zod:
         specifier: ^4.6.7
@@ -100,20 +100,14 @@ importers:
         specifier: workspace:*
         version: link:../config
 
-  src/packages/domain:
-    devDependencies:
-      '@bbferm/config':
-        specifier: workspace:*
-        version: link:../config
-
   src/services/collector:
     dependencies:
-      '@bbferm/contracts':
-        specifier: workspace:*
-        version: link:../../packages/contracts
       '@bbferm/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@bbferm/store-contract':
+        specifier: workspace:*
+        version: link:../store/contract
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -125,11 +119,24 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
-  src/services/store:
+  src/services/store/contract:
     dependencies:
-      '@bbferm/contracts':
+      '@bbferm/domain':
         specifier: workspace:*
-        version: link:../../packages/contracts
+        version: link:../../../packages/domain
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@bbferm/config':
+        specifier: workspace:*
+        version: link:../../../packages/config
+
+  src/services/store/server:
+    dependencies:
+      '@bbferm/store-contract':
+        specifier: workspace:*
+        version: link:../contract
       fastify:
         specifier: ^5.12.8
         version: 5.12.8
@@ -139,7 +146,7 @@ importers:
     devDependencies:
       '@bbferm/config':
         specifier: workspace:*
-        version: link:../../packages/config
+        version: link:../../../packages/config
       tsx:
         specifier: ^4.23.15
         version: 4.23.15

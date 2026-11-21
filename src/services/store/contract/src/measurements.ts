@@ -1,15 +1,5 @@
 import { z } from 'zod'
-import { Id, SpecificGravity, UtcTimestamp } from './common.js'
-
-export const MeasurementSource = z.enum(['tilt', 'manual', 'future_pressure_sensor'])
-export type MeasurementSource = z.infer<typeof MeasurementSource>
-
-export const QualityFlag = z.enum([
-  'gravity_out_of_range',
-  'temperature_out_of_range',
-  'uncalibrated',
-])
-export type QualityFlag = z.infer<typeof QualityFlag>
+import { Id, MeasurementSource, QualityFlag, SpecificGravity, UtcTimestamp } from '@bbferm/domain'
 
 /** Raw Tilt iBeacon fields, preserved for later reinterpretation. */
 export const TiltRawPayload = z.object({
@@ -23,10 +13,10 @@ export const TiltRawPayload = z.object({
 export type TiltRawPayload = z.infer<typeof TiltRawPayload>
 
 /**
- * Measurement submitted by the collector. `id` doubles as the idempotency key,
+ * `POST /measurements` request body. `id` doubles as the idempotency key,
  * so retries cannot create duplicates.
  */
-export const MeasurementIngest = z.object({
+export const MeasurementIngestRequest = z.object({
   id: Id,
   deviceId: Id,
   source: z.literal('tilt'),
@@ -38,9 +28,16 @@ export const MeasurementIngest = z.object({
   rawPayload: TiltRawPayload,
   qualityFlags: z.array(QualityFlag).default([]),
 })
-export type MeasurementIngest = z.infer<typeof MeasurementIngest>
+export type MeasurementIngestRequest = z.infer<typeof MeasurementIngestRequest>
 
-export const Measurement = z.object({
+export const MeasurementIngestResponse = z.object({
+  id: Id,
+  /** `false` when the measurement ID was already recorded (idempotent replay). */
+  created: z.boolean(),
+})
+export type MeasurementIngestResponse = z.infer<typeof MeasurementIngestResponse>
+
+export const StoreMeasurement = z.object({
   id: Id,
   batchId: Id.nullable(),
   deviceId: Id.nullable(),
@@ -54,16 +51,10 @@ export const Measurement = z.object({
   qualityFlags: z.array(QualityFlag),
   createdAt: UtcTimestamp,
 })
-export type Measurement = z.infer<typeof Measurement>
+export type StoreMeasurement = z.infer<typeof StoreMeasurement>
 
+/** `GET /measurements/latest` response: latest reading per device. */
 export const LatestMeasurementsResponse = z.object({
-  measurements: z.array(Measurement),
+  measurements: z.array(StoreMeasurement),
 })
 export type LatestMeasurementsResponse = z.infer<typeof LatestMeasurementsResponse>
-
-export const MeasurementIngestResponse = z.object({
-  id: Id,
-  /** `false` when the measurement ID was already recorded (idempotent replay). */
-  created: z.boolean(),
-})
-export type MeasurementIngestResponse = z.infer<typeof MeasurementIngestResponse>

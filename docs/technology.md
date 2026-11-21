@@ -33,7 +33,12 @@ Standalone Node.js/TypeScript process. Listens for Tilt BLE advertisements throu
 Standalone Fastify service. Owns SQLite, migrations, transactions, and persistence DTOs. It is the only process allowed to open the database.
 
 ### Shared packages
-Use pnpm workspaces. Put runtime validation schemas and API DTOs in a shared `src/packages/contracts` package. Keep domain logic framework-independent where practical.
+Use pnpm workspaces. API contracts are owned by the provider of each API, not by a shared package (see [API contracts](api-contracts.md#contract-ownership)):
+
+- Store publishes `@bbferm/store-contract`, consumed by the BFF and the collector.
+- The BFF's browser-facing schemas live in `src/apps/web/src/server/*.schemas.ts`, consumed by the UI.
+
+Shared value types (IDs, UTC timestamps, specific gravity) and framework-independent domain logic live in `@bbferm/domain`.
 
 ## Suggested monorepo
 
@@ -48,10 +53,11 @@ bbferm/
 │   │   └── web/             # TanStack Start: SPA + BFF
 │   ├── services/
 │   │   ├── collector/       # standalone BLE listener
-│   │   └── store/           # Fastify + SQLite
+│   │   └── store/
+│   │       ├── contract/    # Store's published API schemas
+│   │       └── server/      # Fastify + SQLite
 │   └── packages/
-│       ├── contracts/       # runtime schemas and DTOs
-│       ├── domain/          # shared domain logic
+│       ├── domain/          # domain logic and value types
 │       └── config/
 └── scripts/
     ├── build-release.sh

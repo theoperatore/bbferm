@@ -37,6 +37,16 @@
 ## ADR-008: macOS development, Linux ARM64 runtime
 **Decision:** Build portable assets on the M4 Mac, but ensure native Node dependencies target Linux ARM64.
 
+## ADR-009: Provider-owned API contracts
+**Decision:** Each API provider owns and publishes its schemas. Store publishes `@bbferm/store-contract`; the BFF owns its browser-facing schemas inside the web app. There is no shared cross-service contracts package.
+
+**Rationale:** A shared contracts package has no clear owner, couples unrelated boundaries, and lets internal Store shapes leak to the browser. Provider ownership makes the dependency graph match the call graph and makes compatibility the provider's responsibility.
+
+**Consequences:**
+- Store's contract is a separate, dependency-light package so consumers do not install Store's runtime dependencies.
+- The BFF maps Store DTOs to browser DTOs.
+- Shared value types live in `@bbferm/domain`.
+
 ## Open questions
 - Local CA and certificate trust workflow for `https://bbferm.local`.
 - Single-user or multi-user authentication.

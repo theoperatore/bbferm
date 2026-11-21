@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { MeasurementIngest } from '@bbferm/contracts'
+import { type MeasurementIngestRequest, storeRoutes } from '@bbferm/store-contract'
 import { buildApp } from '../src/app.js'
 import { InMemoryMeasurementRepository } from '../src/repository.js'
 
@@ -14,7 +14,7 @@ function makeApp() {
   return buildApp({ config, measurements: new InMemoryMeasurementRepository() })
 }
 
-const sample = (): MeasurementIngest => ({
+const sample = (): MeasurementIngestRequest => ({
   id: randomUUID(),
   deviceId: randomUUID(),
   source: 'tilt',
@@ -33,14 +33,14 @@ afterEach(() => app?.close())
 describe('store api', () => {
   it('serves unauthenticated health', async () => {
     app = makeApp()
-    const res = await app.inject({ method: 'GET', url: '/internal/v1/health' })
+    const res = await app.inject({ method: 'GET', url: storeRoutes.health })
     expect(res.statusCode).toBe(200)
-    expect(res.json()).toMatchObject({ status: 'ok', service: 'store' })
+    expect(res.json()).toMatchObject({ status: 'ok' })
   })
 
   it('rejects missing credentials with the error envelope', async () => {
     app = makeApp()
-    const res = await app.inject({ method: 'GET', url: '/internal/v1/status' })
+    const res = await app.inject({ method: 'GET', url: storeRoutes.status })
     expect(res.statusCode).toBe(401)
     expect(res.json().error.code).toBe('UNAUTHORIZED')
   })
@@ -49,15 +49,15 @@ describe('store api', () => {
     app = makeApp()
     const m = sample()
     const headers = { authorization: `Bearer ${config.STORE_COLLECTOR_TOKEN}` }
-    const first = await app.inject({ method: 'POST', url: '/internal/v1/measurements', headers, payload: m })
-    const second = await app.inject({ method: 'POST', url: '/internal/v1/measurements', headers, payload: m })
+    const first = await app.inject({ method: 'POST', url: storeRoutes.measurements, headers, payload: m })
+    const second = await app.inject({ method: 'POST', url: storeRoutes.measurements, headers, payload: m })
     expect(first.statusCode).toBe(201)
     expect(second.statusCode).toBe(200)
     expect(second.json()).toEqual({ id: m.id, created: false })
 
     const latest = await app.inject({
       method: 'GET',
-      url: '/internal/v1/measurements/latest',
+      url: storeRoutes.latestMeasurements,
       headers: { authorization: `Bearer ${config.STORE_WEB_TOKEN}` },
     })
     expect(latest.json().measurements).toHaveLength(1)
@@ -67,7 +67,7 @@ describe('store api', () => {
     app = makeApp()
     const res = await app.inject({
       method: 'POST',
-      url: '/internal/v1/measurements',
+      url: storeRoutes.measurements,
       headers: { authorization: `Bearer ${config.STORE_WEB_TOKEN}` },
       payload: sample(),
     })

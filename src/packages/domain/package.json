@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Framework-independent brewing domain logic",
+  "description": "Framework-independent brewing domain logic and value types",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -11,11 +11,16 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@bbferm/config": "workspace:*"

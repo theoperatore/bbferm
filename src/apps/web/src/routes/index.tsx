@@ -2,7 +2,7 @@ import { Alert, Badge, Card, Container, Group, Loader, SimpleGrid, Stack, Text, 
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { celsiusToFahrenheit } from '@bbferm/domain'
-import { getLatestMeasurements } from '../server/measurements.functions'
+import { getLatestReadings } from '../server/measurements.functions'
 
 export const Route = createFileRoute('/')({
   component: Dashboard,
@@ -10,8 +10,8 @@ export const Route = createFileRoute('/')({
 
 function Dashboard() {
   const latest = useQuery({
-    queryKey: ['measurements', 'latest'],
-    queryFn: () => getLatestMeasurements(),
+    queryKey: ['readings', 'latest'],
+    queryFn: () => getLatestReadings(),
     refetchInterval: 30_000,
   })
 
@@ -33,10 +33,10 @@ function Dashboard() {
             The server could not reach the data store.{latest.data ? ' Showing last known values.' : ''}
           </Alert>
         )}
-        {latest.data?.measurements.length === 0 && <Text c="dimmed">No readings yet.</Text>}
+        {latest.data?.readings.length === 0 && <Text c="dimmed">No readings yet.</Text>}
 
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
-          {latest.data?.measurements.map((m) => (
+          {latest.data?.readings.map((m) => (
             <Card key={m.id} withBorder padding="lg">
               <Group justify="space-between" mb="xs">
                 <Text fw={600}>Device {m.deviceId?.slice(0, 8) ?? 'manual'}</Text>

@@ -1,6 +1,5 @@
 import '@tanstack/react-start/server-only'
 import type { z } from 'zod'
-import { STORE_API_PREFIX } from '@bbferm/contracts'
 
 /**
  * Server-only Store client. The Store URL and credential are read from the
@@ -19,11 +18,12 @@ export class StoreUnavailableError extends Error {
   }
 }
 
+/** GET a Store route and parse the response with Store's published schema. */
 export async function storeGet<S extends z.ZodType>(path: string, schema: S): Promise<z.infer<S>> {
   const { url, token } = storeEnv()
   let res: Response
   try {
-    res = await fetch(`${url}${STORE_API_PREFIX}${path}`, {
+    res = await fetch(`${url}${path}`, {
       headers: { authorization: `Bearer ${token}`, accept: 'application/json' },
       signal: AbortSignal.timeout(5000),
     })

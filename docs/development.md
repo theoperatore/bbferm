@@ -6,9 +6,9 @@ Develop on macOS Apple Silicon (M4). Use a pinned Node.js LTS version, pnpm work
 ## Repository boundaries
 - `src/apps/web`: TanStack Start application, client UI, and server/BFF code.
 - `src/services/collector`: standalone Tilt BLE listener.
-- `src/services/store`: standalone Fastify API and sole SQLite owner.
-- `src/packages/contracts`: runtime schemas and DTOs.
-- `src/packages/domain`: framework-independent domain logic.
+- `src/services/store/server`: standalone Fastify API and sole SQLite owner.
+- `src/services/store/contract`: Store's published API schemas; the only Store package that consumers may import.
+- `src/packages/domain`: framework-independent domain logic and value types.
 
 ## Local process workflow
 1. Run Store with a local development SQLite database.

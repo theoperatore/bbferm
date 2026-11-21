@@ -1,4 +1,4 @@
-import { type MeasurementIngest, MeasurementIngestResponse, STORE_API_PREFIX } from '@bbferm/contracts'
+import { type MeasurementIngestRequest, MeasurementIngestResponse, storeRoutes } from '@bbferm/store-contract'
 import type { Logger } from './log.js'
 
 export interface SubmitterOptions {
@@ -15,7 +15,7 @@ export interface SubmitterOptions {
  * can deduplicate. When the queue is full the oldest reading is dropped.
  */
 export class MeasurementSubmitter {
-  readonly #queue: MeasurementIngest[] = []
+  readonly #queue: MeasurementIngestRequest[] = []
   #draining = false
   #stopped = false
   #backoffMs = 0
@@ -29,7 +29,7 @@ export class MeasurementSubmitter {
     return this.#queue.length
   }
 
-  enqueue(m: MeasurementIngest): void {
+  enqueue(m: MeasurementIngestRequest): void {
     if (this.#queue.length >= this.opts.queueMax) {
       const dropped = this.#queue.shift()
       this.opts.log.warn('queue full; dropping oldest measurement', { id: dropped?.id })
@@ -62,9 +62,9 @@ export class MeasurementSubmitter {
     }
   }
 
-  async #submit(m: MeasurementIngest): Promise<boolean> {
+  async #submit(m: MeasurementIngestRequest): Promise<boolean> {
     try {
-      const res = await this.#fetch(`${this.opts.storeUrl}${STORE_API_PREFIX}/measurements`, {
+      const res = await this.#fetch(`${this.opts.storeUrl}${storeRoutes.measurements}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${this.opts.token}` },
         body: JSON.stringify(m),

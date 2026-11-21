@@ -1,6 +1,7 @@
 packages:
   - src/apps/*
-  - src/services/*
+  - src/services/collector
+  - src/services/store/*
   - src/packages/*
 
 onlyBuiltDependencies:

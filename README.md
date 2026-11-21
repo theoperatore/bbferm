@@ -15,7 +15,7 @@ A local-first homebrewing application for recipe management, brew-day logging, a
 | Collector                        | Separate Node.js/TypeScript BLE listener                   |
 | Persistence API                  | Separate Fastify service                                   |
 | Database                         | SQLite, opened only by the persistence service             |
-| Shared contracts                 | TypeScript runtime schemas and DTOs in a workspace package |
+| API contracts                    | Owned and published by each API provider (Zod schemas)     |
 | Process supervision              | systemd                                                    |
 | Deployment                       | Direct Linux services; no Docker                           |
 
@@ -71,7 +71,7 @@ Requires Node.js 24 (`.nvmrc`) and pnpm 10.
 
 ```sh
 pnpm install
-cp src/services/store/.env.example src/services/store/.env
+cp src/services/store/server/.env.example src/services/store/server/.env
 cp src/services/collector/.env.example src/services/collector/.env
 cp src/apps/web/.env.example src/apps/web/.env
 
@@ -88,10 +88,10 @@ pnpm --filter @bbferm/web start   # serve the production web build (PWA + BFF)
 | Path | Package | Purpose |
 | --- | --- | --- |
 | `src/apps/web` | `@bbferm/web` | TanStack Start SPA + BFF, Mantine, TanStack Query, PWA |
-| `src/services/store` | `@bbferm/store` | Fastify internal API (`/internal/v1`), sole SQLite owner |
+| `src/services/store/server` | `@bbferm/store` | Fastify internal API (`/internal/v1`), sole SQLite owner |
+| `src/services/store/contract` | `@bbferm/store-contract` | Store's published API schemas (Zod only), used by the BFF and collector |
 | `src/services/collector` | `@bbferm/collector` | Tilt BLE listener (decoder, replay source, Store submitter) |
-| `src/packages/contracts` | `@bbferm/contracts` | Zod schemas and DTOs shared across boundaries |
-| `src/packages/domain` | `@bbferm/domain` | Framework-independent brewing logic |
+| `src/packages/domain` | `@bbferm/domain` | Framework-independent brewing logic and value types (IDs, timestamps, gravity) |
 | `src/packages/config` | `@bbferm/config` | Shared TypeScript presets |
 
 Workspace packages export TypeScript source under the `@bbferm/source` condition (used by Vite and `tsx` in dev) and compiled `dist/` otherwise (used by the built services).

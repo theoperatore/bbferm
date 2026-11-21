@@ -1,9 +1,9 @@
 {
-  "name": "@bbferm/contracts",
+  "name": "@bbferm/store-contract",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Runtime schemas and DTOs shared across BBFerm services",
+  "description": "Published contract for the Store internal API. Owned by Store; consumed by the web BFF and the collector.",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@bbferm/domain": "workspace:*",
     "zod": "^4.6.7"
   },
   "devDependencies": {

@@ -1,13 +1,12 @@
 import { z } from 'zod'
-import { UtcTimestamp } from './common.js'
+import { UtcTimestamp } from '@bbferm/domain'
 
-export const HealthResponse = z.object({
+export const StoreHealthResponse = z.object({
   status: z.enum(['ok', 'degraded', 'down']),
-  service: z.enum(['web', 'store', 'collector']),
   version: z.string(),
   time: UtcTimestamp,
 })
-export type HealthResponse = z.infer<typeof HealthResponse>
+export type StoreHealthResponse = z.infer<typeof StoreHealthResponse>
 
 export const StoreStatusResponse = z.object({
   database: z.enum(['ok', 'unavailable', 'mock']),
