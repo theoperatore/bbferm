@@ -4,20 +4,20 @@ A local-first homebrewing application for recipe management, brew-day logging, a
 
 ## Technology decisions
 
-| Area | Choice |
-|---|---|
-| Full-stack web framework and BFF | **TanStack Start** |
-| Rendering mode | **SPA mode**; SSR is not required |
-| UI | React + TypeScript + Mantine |
-| Routing | TanStack Router (included with Start) |
-| Client server-state | TanStack Query |
-| PWA | Web app manifest + service worker / Workbox integration |
-| Collector | Separate Node.js/TypeScript BLE listener |
-| Persistence API | Separate Fastify service |
-| Database | SQLite, opened only by the persistence service |
-| Shared contracts | TypeScript runtime schemas and DTOs in a workspace package |
-| Process supervision | systemd |
-| Deployment | Direct Linux services; no Docker |
+| Area                             | Choice                                                     |
+| -------------------------------- | ---------------------------------------------------------- |
+| Full-stack web framework and BFF | **TanStack Start**                                         |
+| Rendering mode                   | **SPA mode**; SSR is not required                          |
+| UI                               | React + TypeScript + Mantine                               |
+| Routing                          | TanStack Router (included with Start)                      |
+| Client server-state              | TanStack Query                                             |
+| PWA                              | Web app manifest + service worker / Workbox integration    |
+| Collector                        | Separate Node.js/TypeScript BLE listener                   |
+| Persistence API                  | Separate Fastify service                                   |
+| Database                         | SQLite, opened only by the persistence service             |
+| Shared contracts                 | TypeScript runtime schemas and DTOs in a workspace package |
+| Process supervision              | systemd                                                    |
+| Deployment                       | Direct Linux services; no Docker                           |
 
 ## Architecture
 
@@ -63,7 +63,7 @@ The browser talks only to TanStack Start. Start and the collector talk to Store 
 - Official Raspberry Pi 256 GB microSD card.
 - Tilt hydrometer(s), received using onboard Bluetooth LE.
 
-The e-paper display is out of scope. Cloud synchronization, remote access, Docker, and automated CI/CD are also out of the initial release scope.
+Cloud synchronization, remote access, Docker, and automated CI/CD are also out of the initial release scope.
 
 ## Documentation
 
