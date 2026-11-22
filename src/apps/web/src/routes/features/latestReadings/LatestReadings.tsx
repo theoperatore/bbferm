@@ -1,8 +1,8 @@
 import { Alert, Badge, Card, Group, Loader, SimpleGrid, Stack, Text } from '@mantine/core'
 import { useQuery } from '@tanstack/react-query'
 import { celsiusToFahrenheit } from '@bbferm/domain'
-import { getLatestReadings } from './latest-readings.functions'
-import type { Reading } from './latest-readings.schemas'
+import { getLatestReadings } from './latestReadings.functions'
+import type { Reading } from './latestReadings.schemas'
 
 export function LatestReadings() {
   const latest = useQuery({

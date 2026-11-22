@@ -1,4 +1,4 @@
-import type { InMemoryDatabase } from '../stores/in-memory-database.js'
+import type { InMemoryDatabase } from '../stores/inMemoryDatabase.js'
 
 type Deps = {
   database: InMemoryDatabase

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Id } from '@bbferm/domain'
-import { tiltDeviceId } from '../src/device-id.js'
+import { tiltDeviceId } from '../src/tilt/deviceId.js'
 
 describe('tiltDeviceId', () => {
   it('is a stable, valid UUID per color', () => {

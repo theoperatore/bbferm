@@ -1,5 +1,5 @@
 import type { MeasurementIngestRequest, StoreMeasurement } from '@bbferm/store-schema'
-import type { MeasurementStore } from '../stores/measurement-store.js'
+import type { MeasurementStore } from '../stores/measurementStore.js'
 
 type Deps = {
   measurementStore: MeasurementStore

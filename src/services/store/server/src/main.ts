@@ -1,15 +1,15 @@
-import { createCallerAuth } from './auth/caller-auth.js'
+import { createCallerAuth } from './auth/callerAuth.js'
 import { loadConfig } from './config.js'
 import { createGetHealthHandler } from './handlers/getHealth.js'
 import { createGetLatestMeasurementsHandler } from './handlers/getLatestMeasurements.js'
 import { createGetStatusHandler } from './handlers/getStatus.js'
 import { createIngestMeasurementHandler } from './handlers/ingestMeasurement.js'
 import { createHttpServer } from './http/server.js'
-import { createHealthService } from './services/health-service.js'
-import { createMeasurementService } from './services/measurement-service.js'
-import { createStatusService } from './services/status-service.js'
-import { createInMemoryDatabase } from './stores/in-memory-database.js'
-import { createInMemoryMeasurementStore } from './stores/measurement-store.js'
+import { createHealthService } from './services/healthService.js'
+import { createMeasurementService } from './services/measurementService.js'
+import { createStatusService } from './services/statusService.js'
+import { createInMemoryDatabase } from './stores/inMemoryDatabase.js'
+import { createInMemoryMeasurementStore } from './stores/measurementStore.js'
 
 // 1. Configuration
 const config = loadConfig()

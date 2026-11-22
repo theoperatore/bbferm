@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import type { StoreMeasurement } from '@bbferm/store-schema'
 import { getLatestMeasurements } from '../../../clients/store/getLatestMeasurements'
-import { LatestReadingsResponse } from './latest-readings.schemas'
+import { LatestReadingsResponse } from './latestReadings.schemas'
 
 /** Store DTO → browser DTO. Raw sensor fields and internal metadata stay server-side. */
 function toReading(m: StoreMeasurement) {

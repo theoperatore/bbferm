@@ -1,6 +1,6 @@
 import { Container, Stack, Title } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
-import { LatestReadings } from './features/latest-readings/LatestReadings'
+import { LatestReadings } from './features/latestReadings/LatestReadings'
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,

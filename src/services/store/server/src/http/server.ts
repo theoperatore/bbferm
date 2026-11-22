@@ -1,6 +1,6 @@
 import Fastify from 'fastify'
 import type { StoreConfig } from '../config.js'
-import { sendError } from './error-envelope.js'
+import { sendError } from './errorEnvelope.js'
 
 type Deps = {
   logLevel: StoreConfig['LOG_LEVEL']

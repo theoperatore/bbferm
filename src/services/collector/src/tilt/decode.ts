@@ -1,14 +1,7 @@
 import type { TiltRawPayload } from '@bbferm/store-schema'
 import { TILT_UUIDS, type TiltColor } from './colors.js'
 
-export interface TiltReading {
-  color: TiltColor
-  /** Tilt Pro / HD reports with one extra decimal of precision. */
-  highResolution: boolean
-  gravity: number
-  temperatureF: number
-  raw: TiltRawPayload
-}
+export type TiltReading = NonNullable<ReturnType<typeof decodeTilt>>
 
 const APPLE_COMPANY_ID = 0x004c
 const IBEACON_TYPE = 0x02
@@ -21,7 +14,7 @@ const BATTERY_SENTINEL_F = 999
  * Expects the 25-byte payload beginning with the little-endian company ID.
  * Returns `null` for anything that is not a Tilt temperature/gravity reading.
  */
-export function decodeTilt(manufacturerData: Uint8Array, rssi?: number): TiltReading | null {
+export function decodeTilt(manufacturerData: Uint8Array, rssi?: number) {
   if (manufacturerData.length < 25) return null
   const view = new DataView(manufacturerData.buffer, manufacturerData.byteOffset, manufacturerData.byteLength)
   if (view.getUint16(0, true) !== APPLE_COMPANY_ID) return null
@@ -41,6 +34,7 @@ export function decodeTilt(manufacturerData: Uint8Array, rssi?: number): TiltRea
 
   return {
     color,
+    /** Tilt Pro / HD reports with one extra decimal of precision. */
     highResolution,
     gravity: highResolution ? minor / 10000 : minor / 1000,
     temperatureF: highResolution ? major / 10 : major,

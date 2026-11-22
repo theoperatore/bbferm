@@ -1,66 +1,48 @@
-import { randomUUID } from 'node:crypto'
-import { type QualityFlag, fahrenheitToCelsius } from '@bbferm/domain'
-import type { MeasurementIngestRequest } from '@bbferm/store-schema'
+import type { AdvertisementSource } from './ble/advertisementSource.js'
+import { createBluezSource } from './ble/bluezSource.js'
+import { createReplaySource } from './ble/replaySource.js'
+import { createStoreClient } from './clients/store/client.js'
+import { createIngestMeasurement } from './clients/store/ingestMeasurement.js'
 import { loadConfig } from './config.js'
-import { tiltDeviceId } from './device-id.js'
+import { createAdvertisementHandler } from './handlers/handleAdvertisement.js'
 import { createLogger } from './log.js'
-import type { AdvertisementSource } from './source.js'
-import { BluezSource } from './sources/bluez.js'
-import { ReplaySource } from './sources/replay.js'
-import { MeasurementSubmitter } from './store-client.js'
-import { decodeTilt } from './tilt/decode.js'
+import { createHealthService } from './services/healthService.js'
+import { createReadingService } from './services/readingService.js'
+import { createSubmissionService } from './services/submissionService.js'
+import { createInMemorySubmissionQueueStore } from './stores/submissionQueueStore.js'
 
+// 1. Configuration
 const config = loadConfig()
 const log = createLogger(config.LOG_LEVEL)
 
-const submitter = new MeasurementSubmitter({
-  storeUrl: config.STORE_URL,
-  token: config.STORE_COLLECTOR_TOKEN,
-  queueMax: config.COLLECTOR_QUEUE_MAX,
-  log,
-})
+// 2. Clients
+const storeClient = createStoreClient({ baseUrl: config.STORE_URL, token: config.STORE_COLLECTOR_TOKEN })
+const ingestMeasurement = createIngestMeasurement({ storeClient })
 
+// 3. Stores
+const queue = createInMemorySubmissionQueueStore({ maxSize: config.COLLECTOR_QUEUE_MAX })
+
+// 4. Services
+const healthService = createHealthService({ log })
+const submissionService = createSubmissionService({ ingestMeasurement, queue, log })
+const readingService = createReadingService({ submissionService, minIntervalS: config.COLLECTOR_MIN_INTERVAL_S, log })
+
+// 5. Handlers, registered to the advertisement source
+const handleAdvertisement = createAdvertisementHandler({ readingService })
 const source: AdvertisementSource =
-  config.COLLECTOR_SOURCE === 'replay' ? new ReplaySource(config.COLLECTOR_REPLAY_FILE) : new BluezSource()
-
-const lastSubmitted = new Map<string, number>()
-
-await source.start((ad) => {
-  const reading = decodeTilt(ad.manufacturerData, ad.rssi)
-  if (!reading) return
-
-  const now = ad.receivedAt.getTime()
-  const last = lastSubmitted.get(reading.color) ?? 0
-  if (now - last < config.COLLECTOR_MIN_INTERVAL_S * 1000) return
-  lastSubmitted.set(reading.color, now)
-
-  const qualityFlags: QualityFlag[] = ['uncalibrated']
-  if (reading.gravity < 0.98 || reading.gravity > 1.15) qualityFlags.push('gravity_out_of_range')
-  if (reading.temperatureF < 25 || reading.temperatureF > 120) qualityFlags.push('temperature_out_of_range')
-
-  const measurement: MeasurementIngestRequest = {
-    id: randomUUID(),
-    deviceId: tiltDeviceId(reading.color),
-    source: 'tilt',
-    receivedAt: ad.receivedAt.toISOString(),
-    rawGravity: reading.gravity,
-    gravity: reading.gravity,
-    rawTemperature: reading.temperatureF,
-    temperatureC: fahrenheitToCelsius(reading.temperatureF),
-    rawPayload: reading.raw,
-    qualityFlags,
-  }
-  log.info('tilt reading', { color: reading.color, gravity: reading.gravity, temperatureF: reading.temperatureF })
-  submitter.enqueue(measurement)
-})
-
-log.info('collector started', { source: config.COLLECTOR_SOURCE })
+  config.COLLECTOR_SOURCE === 'replay' ? createReplaySource({ file: config.COLLECTOR_REPLAY_FILE }) : createBluezSource()
 
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, async () => {
-    log.info('shutting down', { signal, queued: submitter.size })
-    submitter.stop()
+    log.info('shutting down', { signal, queued: submissionService.queued() })
+    healthService.setNotServing()
+    submissionService.stop()
     await source.stop()
     process.exit(0)
   })
 }
+
+// 6. Start, then report serving
+await source.start(handleAdvertisement)
+log.info('collector started', { source: config.COLLECTOR_SOURCE })
+healthService.setServing()

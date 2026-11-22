@@ -1,7 +1,7 @@
 import type { RouteOptions } from 'fastify'
 import { type LatestMeasurementsResponse, storeRoutes } from '@bbferm/store-schema'
-import type { CallerAuth } from '../auth/caller-auth.js'
-import type { MeasurementService } from '../services/measurement-service.js'
+import type { CallerAuth } from '../auth/callerAuth.js'
+import type { MeasurementService } from '../services/measurementService.js'
 
 type Deps = {
   auth: CallerAuth

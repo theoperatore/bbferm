@@ -44,5 +44,5 @@ Tests build the same graph without listening (see `server/test/app.test.ts`) and
 ## Conventions
 
 - Types come from the schema package (`z.infer`) or are inferred from implementations (`export type MeasurementService = ReturnType<typeof createMeasurementService>`). Don't annotate function return types. To give a value a schema type, annotate the variable instead (`const body: StoreStatusResponse = ...`).
-- Errors use the error envelope via `sendError` in `http/error-envelope.ts`. Never return stack traces, SQL, paths, or secrets.
+- Errors use the error envelope via `sendError` in `http/errorEnvelope.ts`. Never return stack traces, SQL, paths, or secrets.
 - `/internal/v1` must stay backward compatible (see the root `CLAUDE.md`).

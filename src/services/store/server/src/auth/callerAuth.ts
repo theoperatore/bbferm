@@ -1,6 +1,6 @@
 import { timingSafeEqual } from 'node:crypto'
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { sendError } from '../http/error-envelope.js'
+import { sendError } from '../http/errorEnvelope.js'
 
 export type Caller = 'web' | 'collector'
 

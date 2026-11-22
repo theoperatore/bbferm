@@ -43,7 +43,7 @@ src/
 - **Never create `lib/`, `utils/`, `helpers/` folders or generic `types.ts` files.** Use descriptive names scoped to where they're used: `formatters/gravity.ts`, not `utils/format.ts`.
 - **If something is only used in one place, inline it** in the file that uses it.
 - Types live with the code that owns them, and are usually inferred from a Zod schema (`z.infer`) or from the implementation.
-- Components are `PascalCase.tsx`. RPC functions in `src/clients/` are named after their function (`getLatestMeasurements.ts`). Other modules are `kebab-case.ts`.
+- Files and folders are camelCase (see the root `CLAUDE.md`): `latestReadings/latestReadings.functions.ts`. RPC files in `src/clients/` are named after their function (`getLatestMeasurements.ts`). Component files are named after the component they export (`LatestReadings.tsx`).
 - BFF file suffixes:
   - `*.functions.ts`: `createServerFn` wrappers.
   - `*.schemas.ts`: browser-facing Zod schemas. Must stay client-safe.

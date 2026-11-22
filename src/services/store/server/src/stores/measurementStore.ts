@@ -1,5 +1,5 @@
 import type { StoreMeasurement } from '@bbferm/store-schema'
-import type { InMemoryDatabase } from './in-memory-database.js'
+import type { InMemoryDatabase } from './inMemoryDatabase.js'
 
 /** Measurement DAO. Persistence only; no business rules. */
 export interface MeasurementStore {

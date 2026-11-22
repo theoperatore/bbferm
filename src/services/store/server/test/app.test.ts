@@ -1,17 +1,17 @@
 import { randomUUID } from 'node:crypto'
 import { afterEach, describe, expect, it } from 'vitest'
 import { type MeasurementIngestRequest, storeRoutes } from '@bbferm/store-schema'
-import { createCallerAuth } from '../src/auth/caller-auth.js'
+import { createCallerAuth } from '../src/auth/callerAuth.js'
 import { createGetHealthHandler } from '../src/handlers/getHealth.js'
 import { createGetLatestMeasurementsHandler } from '../src/handlers/getLatestMeasurements.js'
 import { createGetStatusHandler } from '../src/handlers/getStatus.js'
 import { createIngestMeasurementHandler } from '../src/handlers/ingestMeasurement.js'
 import { createHttpServer } from '../src/http/server.js'
-import { createHealthService } from '../src/services/health-service.js'
-import { createMeasurementService } from '../src/services/measurement-service.js'
-import { createStatusService } from '../src/services/status-service.js'
-import { createInMemoryDatabase } from '../src/stores/in-memory-database.js'
-import { createInMemoryMeasurementStore } from '../src/stores/measurement-store.js'
+import { createHealthService } from '../src/services/healthService.js'
+import { createMeasurementService } from '../src/services/measurementService.js'
+import { createStatusService } from '../src/services/statusService.js'
+import { createInMemoryDatabase } from '../src/stores/inMemoryDatabase.js'
+import { createInMemoryMeasurementStore } from '../src/stores/measurementStore.js'
 
 const tokens = { webToken: 'web-token-123', collectorToken: 'collector-token-123' }
 const web = { authorization: `Bearer ${tokens.webToken}` }

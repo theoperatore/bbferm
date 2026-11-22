@@ -5,7 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import type { RouterContext } from '../router'
 import { theme } from './design/theme'
-import { PwaUpdatePrompt } from './features/pwa-update/PwaUpdatePrompt'
+import { PwaUpdatePrompt } from './features/pwaUpdate/PwaUpdatePrompt'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({

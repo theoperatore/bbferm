@@ -42,9 +42,19 @@ Each API provider owns and publishes its schema; there is no shared cross-servic
 
 Store has its own ground rules in `src/services/store/CLAUDE.md`. They cover the `handlers/` → `services/` → `stores/` and `clients/` layering, construction order in `main.ts`, and health becoming `serving` only after startup.
 
+### Collector
+
+The collector mirrors Store's layering for BLE input; its rules are in `src/services/collector/CLAUDE.md`.
+
 ### Web app
 
 The web app has its own ground rules in `src/apps/web/CLAUDE.md`. They cover folder organization (`features/` and `design/` at the nearest common parent; no `components/`, `lib/` or `utils/`), the TypeScript and React conventions, the BFF file suffixes, and the PWA build workaround.
+
+## Conventions
+
+- **Files and folders are always camelCase** (`measurementService.ts`, `features/latestReadings/`), never kebab-case or snake_case. Exceptions:
+  - Component files are named after the component they export (`LatestReadings.tsx`).
+  - Names a tool requires or generates: `pwa-assets.config.ts`, the generated PWA icons in `src/apps/web/public/`, `routeTree.gen.ts`, `pnpm-workspace.yaml`, `.env.example`.
 
 ## Gotchas
 
