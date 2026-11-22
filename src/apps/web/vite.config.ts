@@ -61,7 +61,8 @@ export default defineConfig({
   plugins: [
     // SPA mode: React renders in the browser; the Start server still serves
     // the shell and runs server functions / server routes (the BFF).
-    tanstackStart({ spa: { enabled: true } }),
+    // `features/` and `design/` folders are colocated in src/routes and must not become routes.
+    tanstackStart({ spa: { enabled: true }, router: { routeFileIgnorePattern: '^(features|design)$' } }),
     // React's Vite plugin must come after Start's.
     viteReact(),
     pwa,

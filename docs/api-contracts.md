@@ -14,7 +14,7 @@ Each API provider owns, validates, and publishes its own schemas. Consumers depe
 | Provider | Published contract | Consumers |
 |---|---|---|
 | Store | `@bbferm/store-contract` (`src/services/store/contract`) | BFF, collector |
-| BFF (TanStack Start) | `src/apps/web/src/server/*.schemas.ts` | Browser UI (same package) |
+| BFF (TanStack Start) | `*.schemas.ts` files in the web app's feature modules | Browser UI (same package) |
 
 - Store's contract package depends only on `zod` and `@bbferm/domain`, so consumers never install Fastify or the SQLite driver.
 - The BFF translates Store DTOs into its own browser DTOs. Store shapes, raw sensor payloads, and internal metadata never reach the browser.

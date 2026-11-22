@@ -1,10 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
-import { LatestMeasurementsResponse, type StoreMeasurement, storeRoutes } from '@bbferm/store-contract'
-import { LatestReadingsResponse, type Reading } from './measurements.schemas'
-import { storeGet } from './store-client.server'
+import type { StoreMeasurement } from '@bbferm/store-contract'
+import { getLatestMeasurements } from '../../../clients/store/getLatestMeasurements'
+import { LatestReadingsResponse } from './latest-readings.schemas'
 
 /** Store DTO → browser DTO. Raw sensor fields and internal metadata stay server-side. */
-function toReading(m: StoreMeasurement): Reading {
+function toReading(m: StoreMeasurement) {
   return {
     id: m.id,
     deviceId: m.deviceId,
@@ -20,6 +20,6 @@ function toReading(m: StoreMeasurement): Reading {
 /** BFF: latest reading per device. */
 export const getLatestReadings = createServerFn({ method: 'GET' }).handler(async () => {
   // TODO(auth): authenticate the browser session before calling Store.
-  const store = await storeGet(storeRoutes.latestMeasurements, LatestMeasurementsResponse)
+  const store = await getLatestMeasurements({})
   return LatestReadingsResponse.parse({ readings: store.measurements.map(toReading) })
 })

@@ -36,7 +36,7 @@ Standalone Fastify service. Owns SQLite, migrations, transactions, and persisten
 Use pnpm workspaces. API contracts are owned by the provider of each API, not by a shared package (see [API contracts](api-contracts.md#contract-ownership)):
 
 - Store publishes `@bbferm/store-contract`, consumed by the BFF and the collector.
-- The BFF's browser-facing schemas live in `src/apps/web/src/server/*.schemas.ts`, consumed by the UI.
+- The BFF's browser-facing schemas live in `*.schemas.ts` files in the web app's feature modules, consumed by the UI.
 
 Shared value types (IDs, UTC timestamps, specific gravity) and framework-independent domain logic live in `@bbferm/domain`.
 

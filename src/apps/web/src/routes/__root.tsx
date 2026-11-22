@@ -4,8 +4,8 @@ import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/c
 import { QueryClientProvider } from '@tanstack/react-query'
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import type { RouterContext } from '../router'
-import { theme } from '../theme'
-import { PwaUpdatePrompt } from '../components/PwaUpdatePrompt'
+import { theme } from './design/theme'
+import { PwaUpdatePrompt } from './features/pwa-update/PwaUpdatePrompt'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
@@ -25,7 +25,12 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
 })
 
-function RootDocument({ children }: { children: ReactNode }) {
+type RootDocumentProps = {
+  children: ReactNode
+}
+
+function RootDocument(props: RootDocumentProps) {
+  const { children } = props
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
