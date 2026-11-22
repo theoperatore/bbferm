@@ -61,6 +61,8 @@ bbferm/
 │   │       └── server/      # Fastify + SQLite
 │   └── packages/
 │       ├── domain/          # domain logic and value types
+│       ├── httpServer/      # shared Fastify server: health, error envelope, start/stop
+│       ├── httpClient/      # shared fetch client for service-to-service calls
 │       └── config/
 └── scripts/
     ├── build-release.sh

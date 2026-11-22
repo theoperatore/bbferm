@@ -43,7 +43,7 @@ src/
 - **Never create `lib/`, `utils/`, `helpers/` folders or generic `types.ts` files.** Use descriptive names scoped to where they're used: `formatters/gravity.ts`, not `utils/format.ts`.
 - **If something is only used in one place, inline it** in the file that uses it.
 - Types live with the code that owns them, and are usually inferred from a Zod schema (`z.infer`) or from the implementation.
-- Files and folders are camelCase (see the root `CLAUDE.md`): `latestReadings/latestReadings.functions.ts`. RPC files in `src/clients/` are named after their function (`getLatestMeasurements.ts`). Component files are named after the component they export (`LatestReadings.tsx`).
+- Files and folders are camelCase (see the root `CLAUDE.md`): `storeHealth/storeHealth.functions.ts`. RPC files in `src/clients/` are named after their function (`getLatestMeasurements.ts`). Component files are named after the component they export (`LatestReadings.tsx`).
 - BFF file suffixes:
   - `*.functions.ts`: `createServerFn` wrappers.
   - `*.schemas.ts`: browser-facing Zod schemas. Must stay client-safe.
@@ -71,25 +71,24 @@ src/
 
 Every call the web server makes to an upstream service goes through `src/clients/<service>/`, where the folder is named after the service (`store`, …). Everything in `src/clients/` is server-only, and every file starts with `import '@tanstack/react-start/server-only'`. Server functions call RPC functions. Nothing else talks to upstream services.
 
-- **`client.ts`** creates the service's client lazily when one is needed (base URL, credentials from `process.env`, transport, timeouts, error mapping). Only the RPC functions in the same folder import it.
-- **One RPC function per file**, named after the function: `clients/store/getLatestMeasurements.ts`. Each file exports three things:
+- **`client.ts`** creates the service's client lazily, on first use, with `createHttpClient` from `@bbferm/http-client` (base URL and credentials from `process.env`; timeout and error mapping come from the package). Only the RPC functions in the same folder import it. Callers handle `HttpServiceUnavailableError` / `HttpRequestRejectedError`.
+- **One RPC function per file**, named after the function: `clients/store/getHealth.ts`. Each file exports three things:
   - **`I<Name>Request`**: an `interface`, like a protobuf/gRPC request message. Fields are optional unless the call can't work without them. Empty is fine.
   - **`<Name>Response`**: a `type`, never an `interface`. It's standalone: never extend or intersect other request or response types (no `extends`, no `&`). It may reference upstream entity types such as `StoreMeasurement`.
   - **`export async function <name>(request: I<Name>Request)`**.
 - **Typing the response without a return annotation:** the response is validated against the upstream's published schema (e.g. `@bbferm/store-schema`). Annotate the local result variable with `<Name>Response` and return it, so the inferred return type is `Promise<<Name>Response>`:
 
   ```ts
-  export interface IGetLatestMeasurementsRequest {}
+  export interface IGetHealthRequest {}
 
-  export type GetLatestMeasurementsResponse = {
-    measurements: StoreMeasurement[]
+  export type GetHealthResponse = {
+    status: 'serving' | 'not_serving'
+    version: string
+    time: string
   }
 
-  export async function getLatestMeasurements(request: IGetLatestMeasurementsRequest) {
-    const response: GetLatestMeasurementsResponse = await storeClient().get(
-      storeRoutes.latestMeasurements,
-      LatestMeasurementsResponse,
-    )
+  export async function getHealth(request: IGetHealthRequest) {
+    const response: GetHealthResponse = await storeClient().get(storeRoutes.health, StoreHealthResponse)
     return response
   }
   ```

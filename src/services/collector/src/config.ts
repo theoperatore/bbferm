@@ -2,13 +2,10 @@ import dotenv from 'dotenv'
 import { z } from 'zod'
 
 const Env = z.object({
-  STORE_URL: z.url().default('http://127.0.0.1:3100'),
-  STORE_COLLECTOR_TOKEN: z.string().min(8),
-  COLLECTOR_SOURCE: z.enum(['replay', 'bluez']).default('replay'),
-  COLLECTOR_REPLAY_FILE: z.string().default('./test/fixtures/advertisements.json'),
-  COLLECTOR_MIN_INTERVAL_S: z.coerce.number().nonnegative().default(60),
-  COLLECTOR_QUEUE_MAX: z.coerce.number().int().positive().default(1000),
-  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  COLLECTOR_HOST: z.string().default('127.0.0.1'),
+  COLLECTOR_PORT: z.coerce.number().int().default(3200),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  // TODO(M4): STORE_URL and STORE_COLLECTOR_TOKEN once measurements are submitted to Store.
 })
 
 export type CollectorConfig = z.infer<typeof Env>

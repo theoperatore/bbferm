@@ -94,12 +94,12 @@ Only Store opens the SQLite file. Neither Start nor the collector may import the
 
 Suggested ports:
 
-| Process             | Bind address        | Port |
-| ------------------- | ------------------- | ---: |
-| HTTPS reverse proxy | LAN interface       |  443 |
-| TanStack Start      | `127.0.0.1`         | 3000 |
-| Fastify Store       | `127.0.0.1`         | 3100 |
-| Collector           | no inbound listener |    — |
+| Process                 | Bind address  | Port |
+| ----------------------- | ------------- | ---: |
+| HTTPS reverse proxy     | LAN interface |  443 |
+| TanStack Start          | `127.0.0.1`   | 3000 |
+| Fastify Store           | `127.0.0.1`   | 3100 |
+| Collector (health only) | `127.0.0.1`   | 3200 |
 
 Only HTTPS is reachable from the LAN. Internal service ports are loopback-only. Use a DHCP reservation and local hostname such as `bbferm.local`.
 

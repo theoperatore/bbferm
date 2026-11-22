@@ -75,8 +75,8 @@ cp src/services/store/server/.env.example src/services/store/server/.env
 cp src/services/collector/.env.example src/services/collector/.env
 cp src/apps/web/.env.example src/apps/web/.env
 
-pnpm dev:store       # Fastify Store on 127.0.0.1:3100 (in-memory until the SQLite driver is chosen)
-pnpm dev:collector   # replays captured Tilt advertisements into Store
+pnpm dev:store       # Fastify Store on 127.0.0.1:3100 (health only until M3)
+pnpm dev:collector   # health endpoint on 127.0.0.1:3200 (BLE collection comes in M4)
 pnpm dev:web         # TanStack Start on 127.0.0.1:3000
 ```
 
@@ -90,8 +90,10 @@ pnpm --filter @bbferm/web start   # serve the production web build (PWA + BFF)
 | `src/apps/web`              | `@bbferm/web`          | TanStack Start SPA + BFF, Mantine, TanStack Query, PWA                         |
 | `src/services/store/server` | `@bbferm/store`        | Fastify internal API (`/internal/v1`), sole SQLite owner                       |
 | `src/services/store/schema` | `@bbferm/store-schema` | Store's published API schemas (Zod only), used by the BFF and collector        |
-| `src/services/collector`    | `@bbferm/collector`    | Tilt BLE listener (decoder, replay source, Store submitter)                    |
+| `src/services/collector`    | `@bbferm/collector`    | Tilt BLE listener (health endpoint only until M4)                              |
 | `src/packages/domain`       | `@bbferm/domain`       | Framework-independent brewing logic and value types (IDs, timestamps, gravity) |
+| `src/packages/httpServer`   | `@bbferm/http-server`  | Shared Fastify server: error envelope, health checks, start/stop               |
+| `src/packages/httpClient`   | `@bbferm/http-client`  | Shared fetch client: schema-validated responses, typed errors                  |
 | `src/packages/config`       | `@bbferm/config`       | Shared TypeScript presets                                                      |
 
 Workspace packages export TypeScript source under the `@bbferm/source` condition (used by Vite and `tsx` in dev) and compiled `dist/` otherwise (used by the built services).

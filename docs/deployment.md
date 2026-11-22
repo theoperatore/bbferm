@@ -8,7 +8,7 @@
 | `bbferm-collector.service` | Node.js        | Continuously receives Tilt BLE advertisements           |
 | `bbferm-store.service`     | Fastify        | Owns SQLite and exposes internal persistence API        |
 
-A reverse proxy such as Caddy terminates HTTPS and forwards to Start on loopback. Store is loopback-only. Collector requires no inbound listener.
+A reverse proxy such as Caddy terminates HTTPS and forwards to Start on loopback. Store is loopback-only. The collector only listens on loopback for its health check.
 
 ## Filesystem
 

@@ -1,13 +1,7 @@
 import { z } from 'zod'
 
-export const StoreErrorCode = z.enum([
-  'VALIDATION_ERROR',
-  'NOT_FOUND',
-  'CONFLICT',
-  'UNAUTHORIZED',
-  'FORBIDDEN',
-  'INTERNAL_ERROR',
-])
+// TODO(M3): add codes (VALIDATION_ERROR, UNAUTHORIZED, FORBIDDEN, CONFLICT) with the endpoints that need them.
+export const StoreErrorCode = z.enum(['NOT_FOUND', 'INTERNAL_ERROR'])
 export type StoreErrorCode = z.infer<typeof StoreErrorCode>
 
 /** Store's error envelope. Never carries stack traces, SQL, paths, or secrets. */

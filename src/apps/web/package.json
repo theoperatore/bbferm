@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@bbferm/domain": "workspace:*",
+    "@bbferm/http-client": "workspace:*",
     "@bbferm/store-schema": "workspace:*",
     "@mantine/core": "^9.8.2",
     "@mantine/hooks": "^9.8.2",

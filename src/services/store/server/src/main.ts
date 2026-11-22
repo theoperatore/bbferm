@@ -1,47 +1,28 @@
-import { createCallerAuth } from './auth/callerAuth.js'
+import { createGetHealthHandler, createHealthService, createHttpServer, startHttpServer } from '@bbferm/http-server'
+import { storeRoutes } from '@bbferm/store-schema'
 import { loadConfig } from './config.js'
-import { createGetHealthHandler } from './handlers/getHealth.js'
-import { createGetLatestMeasurementsHandler } from './handlers/getLatestMeasurements.js'
-import { createGetStatusHandler } from './handlers/getStatus.js'
-import { createIngestMeasurementHandler } from './handlers/ingestMeasurement.js'
-import { createHttpServer } from './http/server.js'
-import { createHealthService } from './services/healthService.js'
-import { createMeasurementService } from './services/measurementService.js'
-import { createStatusService } from './services/statusService.js'
-import { createInMemoryDatabase } from './stores/inMemoryDatabase.js'
-import { createInMemoryMeasurementStore } from './stores/measurementStore.js'
 
 // 1. Configuration
 const config = loadConfig()
 
-// 2. Clients (upstream services): none yet.
+// 2. Clients (upstream services): none.
 
 // 3. Stores
-const database = createInMemoryDatabase()
-const measurementStore = createInMemoryMeasurementStore({ database })
+// TODO(M3): select the SQLite driver and validate it on the Pi Zero 2 W (Linux ARM64 native build, not macOS node_modules).
+// TODO(M3): open the connection with foreign keys and WAL enabled; add migrations and a schema_migrations table.
+// TODO(M3): DAOs for measurements, devices, device assignments, batches, recipes, brew events, idempotency keys (docs/data-model.md).
 
 // 4. Services
 const healthService = createHealthService({ version: '0.0.0' })
-const statusService = createStatusService({ database })
-const measurementService = createMeasurementService({ measurementStore })
+// TODO(M3): services for idempotent measurement ingestion, latest/bounded-history queries, and batch/recipe/device operations.
+// TODO(M3): online SQLite backup and a tested restore procedure.
 
 // 5. Handlers, registered to routes
-const auth = createCallerAuth({ webToken: config.STORE_WEB_TOKEN, collectorToken: config.STORE_COLLECTOR_TOKEN })
 const server = createHttpServer({ logLevel: config.LOG_LEVEL })
-server.route(createGetHealthHandler({ healthService }))
-server.route(createGetStatusHandler({ auth, statusService }))
-server.route(createIngestMeasurementHandler({ auth, measurementService }))
-server.route(createGetLatestMeasurementsHandler({ auth, measurementService }))
-
-for (const signal of ['SIGINT', 'SIGTERM'] as const) {
-  process.once(signal, async () => {
-    server.log.info({ signal }, 'shutting down')
-    healthService.setNotServing()
-    await server.close()
-    process.exit(0)
-  })
-}
+server.route(createGetHealthHandler({ healthService, url: storeRoutes.health }))
+// TODO(M3): separate bearer credentials for web and collector, checked in handlers (auth/).
+// TODO(M3): /internal/v1/status (database + schema version) and the endpoints in docs/api-contracts.md.
 
 // 6. Start, then report serving
-await server.listen({ host: config.STORE_HOST, port: config.STORE_PORT })
-healthService.setServing()
+// TODO(M2): run as bbferm-store.service; verify restart-on-failure, journald logs, and clean SIGTERM shutdown on the Pi.
+await startHttpServer({ server, healthService, host: config.STORE_HOST, port: config.STORE_PORT })

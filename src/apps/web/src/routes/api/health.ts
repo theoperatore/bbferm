@@ -5,7 +5,7 @@ export const Route = createFileRoute('/api/health')({
     handlers: {
       GET: async () =>
         Response.json(
-          { status: 'ok', version: '0.0.0', time: new Date().toISOString() },
+          { status: 'serving', version: '0.0.0', time: new Date().toISOString() },
           { headers: { 'cache-control': 'no-store' } },
         ),
     },

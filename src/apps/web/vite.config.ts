@@ -24,6 +24,7 @@ function pwaAfterStartBuild(pwaPlugins: Plugin[]) {
   return plugin
 }
 
+// TODO(M2): behind Caddy over HTTPS, verify asset paths, SW scope, and that manifest.webmanifest is served as application/manifest+json.
 const pwa = VitePWA({
   outDir: 'dist/client',
   registerType: 'prompt',
