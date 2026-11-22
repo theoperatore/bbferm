@@ -1,3 +1,4 @@
+import dotenv from 'dotenv'
 import { z } from 'zod'
 
 const Env = z.object({
@@ -12,6 +13,12 @@ const Env = z.object({
 
 export type CollectorConfig = z.infer<typeof Env>
 
-export function loadConfig(env: NodeJS.ProcessEnv = process.env): CollectorConfig {
-  return Env.parse(env)
+/**
+ * Loads `.env` from the working directory (if present) into `process.env`,
+ * then validates it. Variables already set (e.g. by systemd's EnvironmentFile
+ * on the Pi) take precedence over `.env`.
+ */
+export function loadConfig() {
+  dotenv.config({ quiet: true })
+  return Env.parse(process.env)
 }

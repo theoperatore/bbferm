@@ -15,7 +15,7 @@ pnpm --filter @bbferm/collector exec vitest run test/decode.test.ts -t "Tilt Pro
 pnpm --filter @bbferm/web start                # serve the production web build (127.0.0.1:3000)
 ```
 
-Local dev needs each service's `.env` copied from its `.env.example` (`src/services/store/server`, `src/services/collector`, `src/apps/web`). The collector replays fixtures from `test/fixtures/advertisements.json` by default; BLE (`COLLECTOR_SOURCE=bluez`) is not implemented yet.
+Each service loads its own `.env` with dotenv (`config({ quiet: true })`, which never overrides variables already set; on the Pi, systemd's `EnvironmentFile` wins). Don't pass `--env-file` flags. Local dev needs each service's `.env` copied from its `.env.example` (`src/services/store/server`, `src/services/collector`, `src/apps/web`). The collector replays fixtures from `test/fixtures/advertisements.json` by default; BLE (`COLLECTOR_SOURCE=bluez`) is not implemented yet.
 
 ## Architecture
 
@@ -27,16 +27,20 @@ browser ──▶ web (TanStack Start, SPA mode: UI + BFF) ──▶ store (Fast
 
 - Web deploys must never restart the collector (BLE advertisements missed while it's down are lost forever).
 - Only Store may open SQLite or import a DB driver. Store and collector are loopback-only; the web server binds `127.0.0.1` (srvx defaults to all interfaces, so keep `--host` in the start script).
-- Store currently uses an in-memory repository behind `MeasurementRepository`; the SQLite driver and BLE library are deliberately unchosen until tested on the Pi.
+- Store currently uses an in-memory database behind the `MeasurementStore` DAO interface; the SQLite driver and BLE library are deliberately unchosen until tested on the Pi.
 
-### Contract ownership (ADR-009)
+### Schema ownership (ADR-009)
 
-Each API provider owns and publishes its schemas; there is no shared contracts package.
+Each API provider owns and publishes its schema; there is no shared cross-service schema package.
 
-- Store publishes `@bbferm/store-contract` (`src/services/store/contract`), consumed by the BFF and collector. It must depend only on `zod` and `@bbferm/domain` so consumers never install Fastify or the DB driver.
-- The BFF owns browser schemas in `*.schemas.ts` files inside its feature modules and maps Store DTOs to them in `*.functions.ts`. UI code must never import `@bbferm/store-contract`; Store shapes and raw sensor payloads must not reach the browser.
+- Store publishes `@bbferm/store-schema` (`src/services/store/schema`), consumed by the BFF and collector. It must depend only on `zod` and `@bbferm/domain` so consumers never install Fastify or the DB driver.
+- The BFF owns browser schemas in `*.schemas.ts` files inside its feature modules and maps Store DTOs to them in `*.functions.ts`. UI code must never import `@bbferm/store-schema`; Store shapes and raw sensor payloads must not reach the browser.
 - Shared value types (Id, UtcTimestamp, SpecificGravity, MeasurementSource, QualityFlag) live in `@bbferm/domain`.
 - `/internal/v1` must stay backward compatible because services deploy independently. Adding fields is safe; removing or renaming needs `/internal/v2`.
+
+### Store
+
+Store has its own ground rules in `src/services/store/CLAUDE.md`. They cover the `handlers/` → `services/` → `stores/` and `clients/` layering, construction order in `main.ts`, and health becoming `serving` only after startup.
 
 ### Web app
 

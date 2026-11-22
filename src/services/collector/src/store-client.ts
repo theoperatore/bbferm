@@ -1,4 +1,4 @@
-import { type MeasurementIngestRequest, MeasurementIngestResponse, storeRoutes } from '@bbferm/store-contract'
+import { type MeasurementIngestRequest, MeasurementIngestResponse, storeRoutes } from '@bbferm/store-schema'
 import type { Logger } from './log.js'
 
 export interface SubmitterOptions {

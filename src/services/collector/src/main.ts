@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { type QualityFlag, fahrenheitToCelsius } from '@bbferm/domain'
-import type { MeasurementIngestRequest } from '@bbferm/store-contract'
+import type { MeasurementIngestRequest } from '@bbferm/store-schema'
 import { loadConfig } from './config.js'
 import { tiltDeviceId } from './device-id.js'
 import { createLogger } from './log.js'

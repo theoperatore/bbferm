@@ -15,7 +15,7 @@ A local-first homebrewing application for recipe management, brew-day logging, a
 | Collector                        | Separate Node.js/TypeScript BLE listener                   |
 | Persistence API                  | Separate Fastify service                                   |
 | Database                         | SQLite, opened only by the persistence service             |
-| API contracts                    | Owned and published by each API provider (Zod schemas)     |
+| API schemas                      | Owned and published by each API provider (Zod)             |
 | Process supervision              | systemd                                                    |
 | Deployment                       | Direct Linux services; no Docker                           |
 
@@ -89,7 +89,7 @@ pnpm --filter @bbferm/web start   # serve the production web build (PWA + BFF)
 | --- | --- | --- |
 | `src/apps/web` | `@bbferm/web` | TanStack Start SPA + BFF, Mantine, TanStack Query, PWA |
 | `src/services/store/server` | `@bbferm/store` | Fastify internal API (`/internal/v1`), sole SQLite owner |
-| `src/services/store/contract` | `@bbferm/store-contract` | Store's published API schemas (Zod only), used by the BFF and collector |
+| `src/services/store/schema` | `@bbferm/store-schema` | Store's published API schemas (Zod only), used by the BFF and collector |
 | `src/services/collector` | `@bbferm/collector` | Tilt BLE listener (decoder, replay source, Store submitter) |
 | `src/packages/domain` | `@bbferm/domain` | Framework-independent brewing logic and value types (IDs, timestamps, gravity) |
 | `src/packages/config` | `@bbferm/config` | Shared TypeScript presets |

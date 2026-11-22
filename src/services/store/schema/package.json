@@ -1,9 +1,9 @@
 {
-  "name": "@bbferm/store-contract",
+  "name": "@bbferm/store-schema",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Published contract for the Store internal API. Owned by Store; consumed by the web BFF and the collector.",
+  "description": "Published schema for the Store internal API. Owned by Store; consumed by the web BFF and the collector.",
   "exports": {
     ".": {
       "types": "./src/index.ts",

@@ -23,9 +23,9 @@ importers:
       '@bbferm/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@bbferm/store-contract':
+      '@bbferm/store-schema':
         specifier: workspace:*
-        version: link:../../services/store/contract
+        version: link:../../services/store/schema
       '@mantine/core':
         specifier: ^9.8.2
         version: 9.8.2(@mantine/hooks@9.8.2(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -41,6 +41,9 @@ importers:
       '@tanstack/react-start':
         specifier: ^1.169.7
         version: 1.169.7(esbuild@0.28.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.2(postcss@8.5.33))(terser@5.51.4)(tsx@4.23.15))
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -105,9 +108,12 @@ importers:
       '@bbferm/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@bbferm/store-contract':
+      '@bbferm/store-schema':
         specifier: workspace:*
-        version: link:../store/contract
+        version: link:../store/schema
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -119,7 +125,7 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
-  src/services/store/contract:
+  src/services/store/schema:
     dependencies:
       '@bbferm/domain':
         specifier: workspace:*
@@ -134,9 +140,12 @@ importers:
 
   src/services/store/server:
     dependencies:
-      '@bbferm/store-contract':
+      '@bbferm/store-schema':
         specifier: workspace:*
-        version: link:../contract
+        version: link:../schema
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
       fastify:
         specifier: ^5.12.8
         version: 5.12.8
@@ -1965,6 +1974,11 @@ packages:
   diff@9.0.0:
     resolution: {integrity: sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw==}
     engines: {node: '>=0.3.1'}
+
+  dotenv@18.0.10:
+    resolution: {integrity: sha512-89FAA1xchzK2mxVWdr5F/0rldwiueXs6zJM86rO66EzekR1iBdiXRthyG+m5GvkJaFH3C2LESzamTkgndmLT2A==}
+    engines: {node: '>=12'}
+    hasBin: true
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -5017,6 +5031,8 @@ snapshots:
   detect-node-es@1.1.0: {}
 
   diff@9.0.0: {}
+
+  dotenv@18.0.10: {}
 
   dunder-proto@1.0.1:
     dependencies:

@@ -1,4 +1,5 @@
 import '@tanstack/react-start/server-only'
+import dotenv from 'dotenv'
 import type { z } from 'zod'
 
 /**
@@ -19,6 +20,8 @@ export class StoreUnavailableError extends Error {
 }
 
 function createStoreClient() {
+  // Load `.env` (if present) for local runs; variables already set by the environment win.
+  dotenv.config({ quiet: true })
   const baseUrl = process.env.STORE_URL ?? 'http://127.0.0.1:3100'
   const token = process.env.STORE_WEB_TOKEN
   if (!token) throw new Error('STORE_WEB_TOKEN is not set')

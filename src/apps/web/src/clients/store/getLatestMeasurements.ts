@@ -1,5 +1,5 @@
 import '@tanstack/react-start/server-only'
-import { LatestMeasurementsResponse, type StoreMeasurement, storeRoutes } from '@bbferm/store-contract'
+import { LatestMeasurementsResponse, type StoreMeasurement, storeRoutes } from '@bbferm/store-schema'
 import { storeClient } from './client'
 
 export interface IGetLatestMeasurementsRequest {}

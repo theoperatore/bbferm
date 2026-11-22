@@ -1,17 +1,36 @@
 import { randomUUID } from 'node:crypto'
 import { afterEach, describe, expect, it } from 'vitest'
-import { type MeasurementIngestRequest, storeRoutes } from '@bbferm/store-contract'
-import { buildApp } from '../src/app.js'
-import { InMemoryMeasurementRepository } from '../src/repository.js'
+import { type MeasurementIngestRequest, storeRoutes } from '@bbferm/store-schema'
+import { createCallerAuth } from '../src/auth/caller-auth.js'
+import { createGetHealthHandler } from '../src/handlers/getHealth.js'
+import { createGetLatestMeasurementsHandler } from '../src/handlers/getLatestMeasurements.js'
+import { createGetStatusHandler } from '../src/handlers/getStatus.js'
+import { createIngestMeasurementHandler } from '../src/handlers/ingestMeasurement.js'
+import { createHttpServer } from '../src/http/server.js'
+import { createHealthService } from '../src/services/health-service.js'
+import { createMeasurementService } from '../src/services/measurement-service.js'
+import { createStatusService } from '../src/services/status-service.js'
+import { createInMemoryDatabase } from '../src/stores/in-memory-database.js'
+import { createInMemoryMeasurementStore } from '../src/stores/measurement-store.js'
 
-const config = {
-  STORE_WEB_TOKEN: 'web-token-123',
-  STORE_COLLECTOR_TOKEN: 'collector-token-123',
-  LOG_LEVEL: 'fatal' as const,
-}
+const tokens = { webToken: 'web-token-123', collectorToken: 'collector-token-123' }
+const web = { authorization: `Bearer ${tokens.webToken}` }
+const collector = { authorization: `Bearer ${tokens.collectorToken}` }
 
-function makeApp() {
-  return buildApp({ config, measurements: new InMemoryMeasurementRepository() })
+/** Same wiring as main.ts, without listening. */
+function compose() {
+  const database = createInMemoryDatabase()
+  const measurementStore = createInMemoryMeasurementStore({ database })
+  const healthService = createHealthService({ version: 'test' })
+  const statusService = createStatusService({ database })
+  const measurementService = createMeasurementService({ measurementStore })
+  const auth = createCallerAuth(tokens)
+  const server = createHttpServer({ logLevel: 'fatal' })
+  server.route(createGetHealthHandler({ healthService }))
+  server.route(createGetStatusHandler({ auth, statusService }))
+  server.route(createIngestMeasurementHandler({ auth, measurementService }))
+  server.route(createGetLatestMeasurementsHandler({ auth, measurementService }))
+  return { server, healthService }
 }
 
 const sample = (): MeasurementIngestRequest => ({
@@ -27,50 +46,58 @@ const sample = (): MeasurementIngestRequest => ({
   qualityFlags: [],
 })
 
-let app: ReturnType<typeof makeApp>
-afterEach(() => app?.close())
+let app: ReturnType<typeof compose>
+afterEach(() => app?.server.close())
 
 describe('store api', () => {
-  it('serves unauthenticated health', async () => {
-    app = makeApp()
-    const res = await app.inject({ method: 'GET', url: storeRoutes.health })
-    expect(res.statusCode).toBe(200)
-    expect(res.json()).toMatchObject({ status: 'ok' })
+  it('reports not_serving (503) until serving, without credentials', async () => {
+    app = compose()
+    const before = await app.server.inject({ method: 'GET', url: storeRoutes.health })
+    expect(before.statusCode).toBe(503)
+    expect(before.json()).toMatchObject({ status: 'not_serving' })
+
+    app.healthService.setServing()
+    const after = await app.server.inject({ method: 'GET', url: storeRoutes.health })
+    expect(after.statusCode).toBe(200)
+    expect(after.json()).toMatchObject({ status: 'serving' })
   })
 
   it('rejects missing credentials with the error envelope', async () => {
-    app = makeApp()
-    const res = await app.inject({ method: 'GET', url: storeRoutes.status })
+    app = compose()
+    const res = await app.server.inject({ method: 'GET', url: storeRoutes.status })
     expect(res.statusCode).toBe(401)
     expect(res.json().error.code).toBe('UNAUTHORIZED')
   })
 
+  it('rejects invalid ingest bodies', async () => {
+    app = compose()
+    const res = await app.server.inject({
+      method: 'POST',
+      url: storeRoutes.measurements,
+      headers: collector,
+      payload: { id: 'not-a-uuid' },
+    })
+    expect(res.statusCode).toBe(400)
+    expect(res.json().error.code).toBe('VALIDATION_ERROR')
+  })
+
   it('ingests measurements idempotently', async () => {
-    app = makeApp()
+    app = compose()
     const m = sample()
-    const headers = { authorization: `Bearer ${config.STORE_COLLECTOR_TOKEN}` }
-    const first = await app.inject({ method: 'POST', url: storeRoutes.measurements, headers, payload: m })
-    const second = await app.inject({ method: 'POST', url: storeRoutes.measurements, headers, payload: m })
+    const first = await app.server.inject({ method: 'POST', url: storeRoutes.measurements, headers: collector, payload: m })
+    const second = await app.server.inject({ method: 'POST', url: storeRoutes.measurements, headers: collector, payload: m })
     expect(first.statusCode).toBe(201)
     expect(second.statusCode).toBe(200)
     expect(second.json()).toEqual({ id: m.id, created: false })
 
-    const latest = await app.inject({
-      method: 'GET',
-      url: storeRoutes.latestMeasurements,
-      headers: { authorization: `Bearer ${config.STORE_WEB_TOKEN}` },
-    })
+    const latest = await app.server.inject({ method: 'GET', url: storeRoutes.latestMeasurements, headers: web })
     expect(latest.json().measurements).toHaveLength(1)
   })
 
   it('does not let the web credential ingest measurements', async () => {
-    app = makeApp()
-    const res = await app.inject({
-      method: 'POST',
-      url: storeRoutes.measurements,
-      headers: { authorization: `Bearer ${config.STORE_WEB_TOKEN}` },
-      payload: sample(),
-    })
+    app = compose()
+    const res = await app.server.inject({ method: 'POST', url: storeRoutes.measurements, headers: web, payload: sample() })
     expect(res.statusCode).toBe(403)
+    expect(res.json().error.code).toBe('FORBIDDEN')
   })
 })

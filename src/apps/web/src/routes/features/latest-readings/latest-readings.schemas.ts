@@ -3,7 +3,7 @@ import { Id, MeasurementSource, QualityFlag, SpecificGravity, UtcTimestamp } fro
 
 /**
  * Browser-facing BFF schemas. Owned by the web app; the UI depends on these,
- * never on Store's contract. Client-safe: no server-only imports.
+ * never on Store's schema. Client-safe: no server-only imports.
  */
 
 export const Reading = z.object({

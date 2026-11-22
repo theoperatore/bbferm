@@ -1,4 +1,4 @@
-import type { TiltRawPayload } from '@bbferm/store-contract'
+import type { TiltRawPayload } from '@bbferm/store-schema'
 import { TILT_UUIDS, type TiltColor } from './colors.js'
 
 export interface TiltReading {

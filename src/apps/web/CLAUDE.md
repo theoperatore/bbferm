@@ -76,7 +76,7 @@ Every call the web server makes to an upstream service goes through `src/clients
   - **`I<Name>Request`**: an `interface`, like a protobuf/gRPC request message. Fields are optional unless the call can't work without them. Empty is fine.
   - **`<Name>Response`**: a `type`, never an `interface`. It's standalone: never extend or intersect other request or response types (no `extends`, no `&`). It may reference upstream entity types such as `StoreMeasurement`.
   - **`export async function <name>(request: I<Name>Request)`**.
-- **Typing the response without a return annotation:** the response is validated against the upstream's published contract (e.g. `@bbferm/store-contract`). Annotate the local result variable with `<Name>Response` and return it, so the inferred return type is `Promise<<Name>Response>`:
+- **Typing the response without a return annotation:** the response is validated against the upstream's published schema (e.g. `@bbferm/store-schema`). Annotate the local result variable with `<Name>Response` and return it, so the inferred return type is `Promise<<Name>Response>`:
 
   ```ts
   export interface IGetLatestMeasurementsRequest {}
@@ -96,8 +96,8 @@ Every call the web server makes to an upstream service goes through `src/clients
 
 ## BFF boundary
 
-- UI code must never import `@bbferm/store-contract`. RPC functions in `src/clients/` validate Store responses with Store's contract; server functions then map them into this app's own `*.schemas.ts` shapes. Store shapes and raw sensor payloads must not reach the browser.
-- Upstream URLs and credentials are read from `process.env` in `src/clients/<service>/client.ts` only. Never use `VITE_*` for secrets.
+- UI code must never import `@bbferm/store-schema`. RPC functions in `src/clients/` validate Store responses with Store's schema; server functions then map them into this app's own `*.schemas.ts` shapes. Store shapes and raw sensor payloads must not reach the browser.
+- Upstream URLs and credentials are read from `process.env` in `src/clients/<service>/client.ts` only, after loading `.env` with dotenv (`dotenv.config({ quiet: true })`). Never use `VITE_*` for secrets.
 - Input validation uses `.validator(...)` in this Start version.
 - Server functions are CSRF-protected by Start: requests without same-origin `sec-fetch-site`/`origin` headers get 403.
 
