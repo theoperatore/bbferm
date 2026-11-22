@@ -33,6 +33,7 @@ TanStack Start is both the web framework and the BFF. It includes TanStack Route
 Run it in **SPA mode**. React renders in the browser; server-side rendering is not required. The Start server still runs in production to serve the client build and execute server-side operations.
 
 Responsibilities:
+
 - Serve the application shell, versioned assets, manifest, and service worker.
 - Handle browser navigation through TanStack Router.
 - Use TanStack Query for caching, polling, mutations, and invalidation.
@@ -46,6 +47,7 @@ Use Start server functions for UI-initiated operations. Use server routes when a
 ## Service 2: BBFerm Collector (standalone Node.js)
 
 Responsibilities:
+
 - Listen continuously for Tilt BLE advertisements using Linux Bluetooth/BlueZ.
 - Identify the Tilt device and decode gravity and temperature.
 - Validate readings and preserve the raw advertisement payload.
@@ -58,6 +60,7 @@ The collector must not depend on an open browser or a running web service. It mu
 ## Service 3: BBFerm Store (standalone Fastify)
 
 Responsibilities:
+
 - Own the SQLite database connection and all SQL.
 - Own migrations, transactions, constraints, and persistence-level domain invariants.
 - Expose a small versioned internal REST API.
@@ -70,6 +73,7 @@ Only Store opens the SQLite file. Neither Start nor the collector may import the
 ## Communication flows
 
 ### Browser read/write
+
 1. Browser calls a Start server function (or a Start server route).
 2. Start authenticates the session and validates the request.
 3. Start calls Store over loopback.
@@ -78,6 +82,7 @@ Only Store opens the SQLite file. Neither Start nor the collector may import the
 6. TanStack Query caches results and refreshes or invalidates them as appropriate.
 
 ### Tilt measurement
+
 1. Collector receives a BLE advertisement.
 2. Collector records raw payload, device identity, and receive timestamp.
 3. Collector decodes and validates the measurement.
@@ -89,12 +94,12 @@ Only Store opens the SQLite file. Neither Start nor the collector may import the
 
 Suggested ports:
 
-| Process | Bind address | Port |
-|---|---|---:|
-| HTTPS reverse proxy | LAN interface | 443 |
-| TanStack Start | `127.0.0.1` | 3000 |
-| Fastify Store | `127.0.0.1` | 3100 |
-| Collector | no inbound listener | — |
+| Process             | Bind address        | Port |
+| ------------------- | ------------------- | ---: |
+| HTTPS reverse proxy | LAN interface       |  443 |
+| TanStack Start      | `127.0.0.1`         | 3000 |
+| Fastify Store       | `127.0.0.1`         | 3100 |
+| Collector           | no inbound listener |    — |
 
 Only HTTPS is reachable from the LAN. Internal service ports are loopback-only. Use a DHCP reservation and local hostname such as `bbferm.local`.
 
@@ -109,6 +114,7 @@ Validate the Start + PWA integration using a production build early. Do not assu
 ## Deployment isolation
 
 Use three systemd units:
+
 - `bbferm-web.service` — TanStack Start application and BFF.
 - `bbferm-collector.service` — BLE listener.
 - `bbferm-store.service` — Fastify API and SQLite owner.

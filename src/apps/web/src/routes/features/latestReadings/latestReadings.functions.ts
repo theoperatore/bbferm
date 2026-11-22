@@ -1,5 +1,5 @@
-import { createServerFn } from '@tanstack/react-start'
 import type { StoreMeasurement } from '@bbferm/store-schema'
+import { createServerFn } from '@tanstack/react-start'
 import { getLatestMeasurements } from '../../../clients/store/getLatestMeasurements'
 import { LatestReadingsResponse } from './latestReadings.schemas'
 

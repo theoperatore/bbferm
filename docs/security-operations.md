@@ -88,6 +88,7 @@ Monitor:
 - Pi temperature, memory, and CPU load
 
 Provide a dashboard indicator distinguishing:
+
 - latest measurement time
 - collector last-seen time
 - database/API availability

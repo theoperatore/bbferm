@@ -1,5 +1,5 @@
-import type { FastifyReply } from 'fastify'
 import type { StoreErrorCode, StoreErrorEnvelope } from '@bbferm/store-schema'
+import type { FastifyReply } from 'fastify'
 
 /** Sends Store's stable error envelope. Never include stack traces, SQL, paths, or secrets. */
 export function sendError(reply: FastifyReply, status: number, code: StoreErrorCode, message: string) {

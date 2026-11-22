@@ -1,5 +1,5 @@
-import type { RouteOptions } from 'fastify'
 import { MeasurementIngestRequest, type MeasurementIngestResponse, storeRoutes } from '@bbferm/store-schema'
+import type { RouteOptions } from 'fastify'
 import type { CallerAuth } from '../auth/callerAuth.js'
 import { sendError } from '../http/errorEnvelope.js'
 import type { MeasurementService } from '../services/measurementService.js'

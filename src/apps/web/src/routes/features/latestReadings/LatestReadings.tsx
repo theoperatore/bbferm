@@ -1,6 +1,6 @@
+import { celsiusToFahrenheit } from '@bbferm/domain'
 import { Alert, Badge, Card, Group, Loader, SimpleGrid, Stack, Text } from '@mantine/core'
 import { useQuery } from '@tanstack/react-query'
-import { celsiusToFahrenheit } from '@bbferm/domain'
 import { getLatestReadings } from './latestReadings.functions'
 import type { Reading } from './latestReadings.schemas'
 
@@ -26,7 +26,9 @@ export function LatestReadings() {
       )}
       {latest.data?.readings.length === 0 && <Text c="dimmed">No readings yet.</Text>}
       <SimpleGrid cols={{ base: 1, sm: 2 }}>
-        {latest.data?.readings.map((reading) => <ReadingCard key={reading.id} reading={reading} />)}
+        {latest.data?.readings.map((reading) => (
+          <ReadingCard key={reading.id} reading={reading} />
+        ))}
       </SimpleGrid>
     </Stack>
   )

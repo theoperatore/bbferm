@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto'
-import { type QualityFlag, fahrenheitToCelsius } from '@bbferm/domain'
+import { fahrenheitToCelsius, type QualityFlag } from '@bbferm/domain'
 import type { MeasurementIngestRequest } from '@bbferm/store-schema'
 import type { Logger } from '../log.js'
-import { tiltDeviceId } from '../tilt/deviceId.js'
 import type { TiltReading } from '../tilt/decode.js'
+import { tiltDeviceId } from '../tilt/deviceId.js'
 import type { SubmissionService } from './submissionService.js'
 
 type Deps = {

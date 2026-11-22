@@ -30,7 +30,9 @@ const readingService = createReadingService({ submissionService, minIntervalS: c
 // 5. Handlers, registered to the advertisement source
 const handleAdvertisement = createAdvertisementHandler({ readingService })
 const source: AdvertisementSource =
-  config.COLLECTOR_SOURCE === 'replay' ? createReplaySource({ file: config.COLLECTOR_REPLAY_FILE }) : createBluezSource()
+  config.COLLECTOR_SOURCE === 'replay'
+    ? createReplaySource({ file: config.COLLECTOR_REPLAY_FILE })
+    : createBluezSource()
 
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, async () => {

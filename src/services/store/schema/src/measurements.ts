@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { Id, MeasurementSource, QualityFlag, SpecificGravity, UtcTimestamp } from '@bbferm/domain'
+import { z } from 'zod'
 
 /** Raw Tilt iBeacon fields, preserved for later reinterpretation. */
 export const TiltRawPayload = z.object({

@@ -1,7 +1,7 @@
-import { type Plugin, defaultClientConditions, defaultServerConditions, defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import { VitePWA, type VitePluginPWAAPI } from 'vite-plugin-pwa'
+import { defaultClientConditions, defaultServerConditions, defineConfig, type Plugin } from 'vite'
+import { type VitePluginPWAAPI, VitePWA } from 'vite-plugin-pwa'
 
 /**
  * Start builds the client and server environments and then prerenders the SPA
@@ -10,10 +10,10 @@ import { VitePWA, type VitePluginPWAAPI } from 'vite-plugin-pwa'
  * Start's `buildApp` completes so the shell is precached as the navigation
  * fallback.
  */
-function pwaAfterStartBuild(pwaPlugins: Plugin[]): Plugin {
+function pwaAfterStartBuild(pwaPlugins: Plugin[]) {
   const api = pwaPlugins.find((p) => p.name === 'vite-plugin-pwa')?.api as VitePluginPWAAPI | undefined
   if (!api) throw new Error('vite-plugin-pwa API not found')
-  return {
+  const plugin: Plugin = {
     name: 'bbferm:pwa-after-start-build',
     apply: 'build',
     // Start's prerender runs in an `enforce: 'post'`, `order: 'post'` buildApp hook;
@@ -21,6 +21,7 @@ function pwaAfterStartBuild(pwaPlugins: Plugin[]): Plugin {
     enforce: 'post',
     buildApp: { order: 'post', handler: () => api.generateSW() },
   }
+  return plugin
 }
 
 const pwa = VitePWA({

@@ -25,7 +25,8 @@ export function createReplaySource(deps: Deps) {
       if (fixtures.length === 0) return
       let i = 0
       timer = setInterval(() => {
-        const f = fixtures[i++ % fixtures.length]!
+        const f = fixtures[i++ % fixtures.length]
+        if (!f) return
         onAdvertisement({
           manufacturerData: Buffer.from(f.manufacturerDataHex, 'hex'),
           ...(f.rssi === undefined ? {} : { rssi: f.rssi }),

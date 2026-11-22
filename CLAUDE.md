@@ -9,7 +9,8 @@ BBFerm is a local-first homebrewing app running on a Raspberry Pi Zero 2 W (512 
 Node 24 (`.nvmrc`), pnpm 10. Run from the repo root.
 
 ```sh
-pnpm typecheck && pnpm test && pnpm build      # everything, topologically ordered
+pnpm lint && pnpm typecheck && pnpm test && pnpm build   # everything
+pnpm format                                    # Biome: format, sort imports, apply safe lint fixes
 pnpm dev:store | pnpm dev:collector | pnpm dev:web
 pnpm --filter @bbferm/collector exec vitest run test/decode.test.ts -t "Tilt Pro"   # single test
 pnpm --filter @bbferm/web start                # serve the production web build (127.0.0.1:3000)
@@ -51,6 +52,16 @@ The collector mirrors Store's layering for BLE input; its rules are in `src/serv
 The web app has its own ground rules in `src/apps/web/CLAUDE.md`. They cover folder organization (`features/` and `design/` at the nearest common parent; no `components/`, `lib/` or `utils/`), the TypeScript and React conventions, the BFF file suffixes, and the PWA build workaround.
 
 ## Conventions
+
+Biome (`biome.json`) handles formatting and linting. Custom rules live as GritQL plugins in `biome/`. It enforces:
+
+- camelCase file names (PascalCase also allowed for `.tsx` components)
+- no return-type annotations, and no destructured component props in the parameter list (both via plugins)
+- no imports from `utils`/`lib`/`helpers` folders or `types` files
+- no `@bbferm/store-schema` imports in web UI code (only `src/clients/**` and `*.functions.ts`)
+- no default exports outside `*.config.*`, and no barrel files outside package entry points
+
+Fix violations; don't suppress them. Biome's "safe" fix for an empty `interface` would turn the `I<Name>Request` interfaces in `clients/` into types, so that rule is off there.
 
 - **Files and folders are always camelCase** (`measurementService.ts`, `features/latestReadings/`), never kebab-case or snake_case. Exceptions:
   - Component files are named after the component they export (`LatestReadings.tsx`).

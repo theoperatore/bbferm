@@ -1,5 +1,5 @@
-import type { RouteOptions } from 'fastify'
 import { type StoreHealthResponse, storeRoutes } from '@bbferm/store-schema'
+import type { RouteOptions } from 'fastify'
 import type { HealthService } from '../services/healthService.js'
 
 type Deps = {

@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
 import type { MeasurementIngestRequest } from '@bbferm/store-schema'
+import { describe, expect, it, vi } from 'vitest'
 import { StoreRejectedError, StoreUnavailableError } from '../src/clients/store/client.js'
 import type { IIngestMeasurementRequest } from '../src/clients/store/ingestMeasurement.js'
 import { createLogger } from '../src/log.js'

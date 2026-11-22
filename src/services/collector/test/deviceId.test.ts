@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
 import { Id } from '@bbferm/domain'
+import { describe, expect, it } from 'vitest'
 import { tiltDeviceId } from '../src/tilt/deviceId.js'
 
 describe('tiltDeviceId', () => {

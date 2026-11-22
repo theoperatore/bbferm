@@ -27,12 +27,15 @@ Use a manifest and service worker, likely with Workbox tooling. Confirm compatib
 ## Independent backend services
 
 ### Collector
+
 Standalone Node.js/TypeScript process. Listens for Tilt BLE advertisements through Linux BlueZ and submits measurements to Store. Test the selected BLE library on the actual Pi early.
 
 ### Store
+
 Standalone Fastify service. Owns SQLite, migrations, transactions, and persistence DTOs. It is the only process allowed to open the database.
 
 ### Shared packages
+
 Use pnpm workspaces. API schemas are owned by the provider of each API, not by a shared package (see [API contracts](api-contracts.md#schema-ownership)):
 
 - Store publishes `@bbferm/store-schema`, consumed by the BFF and the collector.

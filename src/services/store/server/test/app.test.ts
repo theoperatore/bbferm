@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { afterEach, describe, expect, it } from 'vitest'
 import { type MeasurementIngestRequest, storeRoutes } from '@bbferm/store-schema'
+import { afterEach, describe, expect, it } from 'vitest'
 import { createCallerAuth } from '../src/auth/callerAuth.js'
 import { createGetHealthHandler } from '../src/handlers/getHealth.js'
 import { createGetLatestMeasurementsHandler } from '../src/handlers/getLatestMeasurements.js'
@@ -33,18 +33,21 @@ function compose() {
   return { server, healthService }
 }
 
-const sample = (): MeasurementIngestRequest => ({
-  id: randomUUID(),
-  deviceId: randomUUID(),
-  source: 'tilt',
-  receivedAt: new Date().toISOString(),
-  rawGravity: 1.042,
-  gravity: 1.042,
-  rawTemperature: 68,
-  temperatureC: 20,
-  rawPayload: { version: 1, uuid: 'a495bb30c5b14b44b5121370f02d74de', major: 68, minor: 1042, txPower: -59 },
-  qualityFlags: [],
-})
+function sample() {
+  const measurement: MeasurementIngestRequest = {
+    id: randomUUID(),
+    deviceId: randomUUID(),
+    source: 'tilt',
+    receivedAt: new Date().toISOString(),
+    rawGravity: 1.042,
+    gravity: 1.042,
+    rawTemperature: 68,
+    temperatureC: 20,
+    rawPayload: { version: 1, uuid: 'a495bb30c5b14b44b5121370f02d74de', major: 68, minor: 1042, txPower: -59 },
+    qualityFlags: [],
+  }
+  return measurement
+}
 
 let app: ReturnType<typeof compose>
 afterEach(() => app?.server.close())
@@ -84,8 +87,18 @@ describe('store api', () => {
   it('ingests measurements idempotently', async () => {
     app = compose()
     const m = sample()
-    const first = await app.server.inject({ method: 'POST', url: storeRoutes.measurements, headers: collector, payload: m })
-    const second = await app.server.inject({ method: 'POST', url: storeRoutes.measurements, headers: collector, payload: m })
+    const first = await app.server.inject({
+      method: 'POST',
+      url: storeRoutes.measurements,
+      headers: collector,
+      payload: m,
+    })
+    const second = await app.server.inject({
+      method: 'POST',
+      url: storeRoutes.measurements,
+      headers: collector,
+      payload: m,
+    })
     expect(first.statusCode).toBe(201)
     expect(second.statusCode).toBe(200)
     expect(second.json()).toEqual({ id: m.id, created: false })
@@ -96,7 +109,12 @@ describe('store api', () => {
 
   it('does not let the web credential ingest measurements', async () => {
     app = compose()
-    const res = await app.server.inject({ method: 'POST', url: storeRoutes.measurements, headers: web, payload: sample() })
+    const res = await app.server.inject({
+      method: 'POST',
+      url: storeRoutes.measurements,
+      headers: web,
+      payload: sample(),
+    })
     expect(res.statusCode).toBe(403)
     expect(res.json().error.code).toBe('FORBIDDEN')
   })

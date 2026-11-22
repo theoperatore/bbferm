@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { UtcTimestamp } from '@bbferm/domain'
+import { z } from 'zod'
 
 /**
  * `GET /health`. `serving` only once Store has finished constructing its

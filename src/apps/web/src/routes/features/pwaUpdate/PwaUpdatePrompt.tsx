@@ -1,5 +1,5 @@
-import { Button, Group, Notification } from '@mantine/core'
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import { Button, Group, Notification } from '@mantine/core'
 
 /** Registers the service worker and offers a reload when a new version is ready. */
 export function PwaUpdatePrompt() {

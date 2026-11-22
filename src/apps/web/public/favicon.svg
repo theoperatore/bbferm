@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>BBFerm</title>
   <rect width="512" height="512" rx="96" fill="#b45309"/>
   <path d="M176 128h160l-16 32v208a48 48 0 0 1-48 48h-32a48 48 0 0 1-48-48V160z" fill="#fef3c7"/>
   <path d="M192 256h128v112a32 32 0 0 1-32 32h-64a32 32 0 0 1-32-32z" fill="#f59e0b"/>

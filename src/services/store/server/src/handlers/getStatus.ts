@@ -1,5 +1,5 @@
-import type { RouteOptions } from 'fastify'
 import { type StoreStatusResponse, storeRoutes } from '@bbferm/store-schema'
+import type { RouteOptions } from 'fastify'
 import type { CallerAuth } from '../auth/callerAuth.js'
 import type { StatusService } from '../services/statusService.js'
 
