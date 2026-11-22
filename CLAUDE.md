@@ -61,7 +61,7 @@ Biome (`biome.json`) handles formatting and linting. Custom rules live as GritQL
 - no `@bbferm/store-schema` imports in web UI code (only `src/clients/**` and `*.functions.ts`)
 - no default exports outside `*.config.*`, and no barrel files outside package entry points
 
-Fix violations; don't suppress them. Biome's "safe" fix for an empty `interface` would turn the `I<Name>Request` interfaces in `clients/` into types, so that rule is off there.
+A lefthook pre-commit hook (`lefthook.yml`, installed by `pnpm install`) runs `biome check` on staged files and blocks the commit on lint or formatting errors. It doesn't modify files. Fix violations; don't suppress them, and don't bypass the hook with `--no-verify`. Biome's "safe" fix for an empty `interface` would turn the `I<Name>Request` interfaces in `clients/` into types, so that rule is off there.
 
 - **Files and folders are always camelCase** (`measurementService.ts`, `features/latestReadings/`), never kebab-case or snake_case. Exceptions:
   - Component files are named after the component they export (`LatestReadings.tsx`).
