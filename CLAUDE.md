@@ -38,6 +38,8 @@ Each API provider owns and publishes its schema; there is no shared cross-servic
 - Store publishes `@bbferm/store-schema` (`src/services/store/schema`), consumed by the BFF and collector. It must depend only on `zod` (and `@bbferm/domain`) so consumers never install Fastify or the DB driver.
 - The BFF owns browser schemas in `*.schemas.ts` files inside its feature modules and maps Store DTOs to them in `*.functions.ts`. UI code must never import `@bbferm/store-schema`; Store shapes and raw sensor payloads must not reach the browser.
 - `@bbferm/domain` holds framework-independent brewing logic (unit and gravity conversions); shared value types go there when they're needed.
+- **Messages:** each RPC has a matched pair in the schema package, `<Name>Request` and `<Name>Response`. Each is a Zod validator plus a same-named concrete type derived from it: `type <Name>Request = z.input<typeof <Name>Request>` (fields with defaults are optional for callers) and `type <Name>Response = z.output<typeof <Name>Response>`. Shared message types (e.g. `Pagination`) follow the same pattern. Consumers import these; they never redeclare them. No interfaces, and no `extends` or `&` between messages.
+- **Optional fields use protobuf-style defaults, never `undefined`:** `.default(0)` for numbers, `.default('')` for strings, `.default([])` for arrays. They're optional in the `<Name>Request` type (callers may omit them) and always present after parsing. `.optional()`, `.nullish()` and `.partial()` are banned in `*/schema/src/` by a Biome plugin.
 - `/internal/v1` must stay backward compatible because services deploy independently. Adding fields is safe; removing or renaming needs `/internal/v2`.
 
 ### Shared HTTP packages
@@ -73,7 +75,7 @@ Biome (`biome.json`) handles formatting and linting. Custom rules live as GritQL
 - no `@bbferm/store-schema` imports in web UI code (only `src/clients/**` and `*.functions.ts`)
 - no default exports outside `*.config.*`, and no barrel files outside package entry points
 
-A lefthook pre-commit hook (`lefthook.yml`, installed by `pnpm install`) runs `biome check` on staged files and blocks the commit on lint or formatting errors. It doesn't modify files. Fix violations; don't suppress them, and don't bypass the hook with `--no-verify`. Biome's "safe" fix for an empty `interface` would turn the `I<Name>Request` interfaces in `clients/` into types, so that rule is off there.
+A lefthook pre-commit hook (`lefthook.yml`, installed by `pnpm install`) runs `biome check` on staged files and blocks the commit on lint or formatting errors. It doesn't modify files. Fix violations; don't suppress them, and don't bypass the hook with `--no-verify`. In `clients/`, the unused-parameter rule is off, because RPC functions always take `request` even when the call doesn't use it yet.
 
 - **Files and folders are always camelCase** (`httpClient.ts`, `features/storeHealth/`), never kebab-case or snake_case. Exceptions:
   - Component files are named after the component they export (`StoreHealth.tsx`).

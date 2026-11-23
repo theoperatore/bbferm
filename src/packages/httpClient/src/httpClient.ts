@@ -56,6 +56,7 @@ export function createHttpClient(deps: Deps) {
     return schema.parse(await res.json());
   }
 
+  // TODO(M3): decide how GET request fields map to query parameters (query values arrive as strings) when the first GET with parameters lands.
   return {
     get: <S extends z.ZodType>(path: string, schema: S) => request('GET', path, schema),
     post: <S extends z.ZodType>(path: string, body: unknown, schema: S) => request('POST', path, schema, body),

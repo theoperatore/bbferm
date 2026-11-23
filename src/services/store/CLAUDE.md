@@ -2,7 +2,7 @@
 
 Store is two packages:
 
-- **`schema/`** (`@bbferm/store-schema`): Store's published API schema, made of Zod schemas, inferred types, and route paths. Consumers (web BFF, collector) import only this. It may depend only on `zod` (and `@bbferm/domain`).
+- **`schema/`** (`@bbferm/store-schema`): Store's published API schema: route paths, and for each RPC a `<Name>Request` / `<Name>Response` validator pair, each with a same-named type derived from it (see "Messages" in the root `CLAUDE.md`). Handlers parse requests with `<Name>Request`, which fills in defaults. Consumers (web BFF, collector) import only this. It may depend only on `zod` (and `@bbferm/domain`).
 - **`server/`** (`@bbferm/store`): the Fastify service and the only process that opens SQLite.
 
 ## Server abstractions

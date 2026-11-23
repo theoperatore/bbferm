@@ -72,24 +72,14 @@ src/
 Every call the web server makes to an upstream service goes through `src/clients/<service>/`, where the folder is named after the service (`store`, …). Everything in `src/clients/` is server-only, and every file starts with `import '@tanstack/react-start/server-only'`. Server functions call RPC functions. Nothing else talks to upstream services.
 
 - **`client.ts`** creates the service's client lazily, on first use, with `createHttpClient` from `@bbferm/http-client` (base URL and credentials from `process.env`; timeout and error mapping come from the package). Only the RPC functions in the same folder import it. Callers handle `HttpServiceUnavailableError` / `HttpRequestRejectedError`.
-- **One RPC function per file**, named after the function: `clients/store/getHealth.ts`. Each file exports three things:
-  - **`I<Name>Request`**: an `interface`, like a protobuf/gRPC request message. Fields are optional unless the call can't work without them. Empty is fine.
-  - **`<Name>Response`**: a `type`, never an `interface`. It's standalone: never extend or intersect other request or response types (no `extends`, no `&`). It may reference upstream entity types such as `StoreMeasurement`.
-  - **`export async function <name>(request: I<Name>Request)`**.
-- **Typing the response without a return annotation:** the response is validated against the upstream's published schema (e.g. `@bbferm/store-schema`). Annotate the local result variable with `<Name>Response` and return it, so the inferred return type is `Promise<<Name>Response>`:
+- **One RPC function per file**, named after the function: `clients/store/getHealth.ts`. It exports `async function <name>(request: <Name>Request)` and nothing else.
+- **Request and response types come from the upstream's schema package, never from the client.** `<Name>Request`, `<Name>Response` (each both a validator and a type) are imported from e.g. `@bbferm/store-schema`. Don't declare request or response types in `src/clients/`. The function returns `client.get(route, <Name>Response)`, so its return type is inferred as `Promise<<Name>Response>`:
 
   ```ts
-  export interface IGetHealthRequest {}
+  import { GetHealthResponse, type GetHealthRequest, storeRoutes } from '@bbferm/store-schema';
 
-  export type GetHealthResponse = {
-    status: 'serving' | 'not_serving';
-    version: string;
-    time: string;
-  };
-
-  export async function getHealth(request: IGetHealthRequest) {
-    const response: GetHealthResponse = await storeClient().get(storeRoutes.health, StoreHealthResponse);
-    return response;
+  export async function getHealth(request: GetHealthRequest) {
+    return storeClient().get(storeRoutes.health, GetHealthResponse);
   }
   ```
 

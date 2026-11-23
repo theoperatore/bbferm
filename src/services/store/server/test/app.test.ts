@@ -1,5 +1,5 @@
 import { createHttpServer } from '@bbferm/http-server';
-import { StoreErrorEnvelope, StoreHealthResponse, storeRoutes } from '@bbferm/store-schema';
+import { GetHealthResponse, StoreErrorEnvelope, storeRoutes } from '@bbferm/store-schema';
 import { afterEach, describe, expect, it } from 'vitest';
 
 /** Same wiring as main.ts, without listening. */
@@ -17,7 +17,7 @@ describe('store api matches @bbferm/store-schema', () => {
     app.health.setServing();
     const res = await app.fastify.inject({ method: 'GET', url: storeRoutes.health });
     expect(res.statusCode).toBe(200);
-    expect(StoreHealthResponse.parse(res.json())).toMatchObject({ status: 'serving' });
+    expect(GetHealthResponse.parse(res.json())).toMatchObject({ status: 'serving' });
   });
 
   it('error envelope', async () => {

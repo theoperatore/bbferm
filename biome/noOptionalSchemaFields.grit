@@ -1,0 +1,13 @@
+language js(typescript)
+
+// Schema packages: optional fields use protobuf-style defaults (.default(0), .default(''), .default([])),
+// so parsed messages never contain undefined.
+`$schema.$method($args)` where {
+  $filename <: r".*/schema/src/.*",
+  $method <: or {
+    `optional`,
+    `nullish`,
+    `partial`
+  },
+  register_diagnostic(span=$method, message="Schema fields can't be undefined. Give optional fields a protobuf-style default instead: .default(0), .default(''), .default([]).")
+}

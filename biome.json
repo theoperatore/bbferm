@@ -31,7 +31,11 @@
       }
     }
   },
-  "plugins": ["./biome/noReturnTypeAnnotations.grit", "./biome/noDestructuredProps.grit"],
+  "plugins": [
+    "./biome/noReturnTypeAnnotations.grit",
+    "./biome/noDestructuredProps.grit",
+    "./biome/noOptionalSchemaFields.grit"
+  ],
   "linter": {
     "enabled": true,
     "rules": {
@@ -167,9 +171,6 @@
       "includes": ["**/clients/**"],
       "linter": {
         "rules": {
-          "suspicious": {
-            "noEmptyInterface": "off"
-          },
           "correctness": {
             "noUnusedFunctionParameters": "off"
           }

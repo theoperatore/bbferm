@@ -9,7 +9,7 @@ export const StoreErrorEnvelope = z.object({
   error: z.object({
     code: StoreErrorCode,
     message: z.string(),
-    requestId: z.string().optional(),
+    requestId: z.string(),
   }),
 });
 export type StoreErrorEnvelope = z.infer<typeof StoreErrorEnvelope>;
