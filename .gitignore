@@ -13,3 +13,6 @@ dev-dist/
 *.sqlite
 *.sqlite-*
 data/
+
+# Personal Claude Code instructions
+CLAUDE.local.md
