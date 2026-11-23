@@ -103,7 +103,7 @@ Suggested ports:
 
 Only HTTPS is reachable from the LAN (Caddy also listens on port 80 to redirect to HTTPS). Internal service ports are loopback-only.
 
-PWA service workers and `Secure` session cookies require a secure context, so plain HTTP is not sufficient. Each installation is served at `https://<install>.bbferm.example` with a publicly trusted Let's Encrypt certificate obtained via DNS-01; the hostname's A record points to the Pi's LAN IP, and the Pi keeps it up to date. Client devices need no certificate installation. See ADR-010 and `deployment.md`.
+PWA service workers and `Secure` session cookies require a secure context, so plain HTTP is not sufficient. Each installation is served at `https://bbferm.local` (mDNS) with a certificate from Caddy's local CA. The CA's root is generated per installation and name-constrained to `bbferm.local`, and each client device installs it once. See ADR-010 and `deployment.md`.
 
 ## PWA and offline behavior
 

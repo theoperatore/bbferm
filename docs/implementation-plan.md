@@ -19,9 +19,9 @@
 - Install Raspberry Pi OS Lite 64-bit.
 - Configure Ethernet, hostname, SSH keys, Bluetooth, and Tailscale for administrator access.
 - Install pinned Node runtime.
-- Register the dedicated BBFerm domain and DigitalOcean DNS; create a per-install scoped token.
-- Build Caddy with the DigitalOcean DNS module; serve `https://<install>.bbferm.example` with a DNS-01 certificate (ADR-010).
-- Add `bbferm-dns.timer` to keep the A record pointed at the Pi's LAN IP.
+- Create the installation's name-constrained root and confirm it rejects other names and IP addresses (ADR-010).
+- Install Caddy with `tls internal` using that root; serve `https://bbferm.local` and confirm the served chain ends at the root.
+- Install the root on client devices (iOS, Android, macOS, Windows) and confirm each platform rejects a certificate for another name signed by it.
 - On real devices over HTTPS, verify PWA install (iOS Safari, Android Chrome, desktop), offline app shell, update prompt, asset paths, and manifest content type.
 - Create service accounts and filesystem layout.
 - Deploy Start under `bbferm-web.service`.

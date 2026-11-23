@@ -7,7 +7,7 @@
 - Do not expose the SQLite file over SMB/NFS.
 - Do not expose the internal persistence API to the LAN.
 - Do not configure public port forwarding.
-- Use a DHCP reservation and firewall rules to restrict access where you administer the router (e.g. the home UniFi network). Installations in other households rely on the Pi updating its own DNS record instead (ADR-010).
+- Use a DHCP reservation and firewall rules to restrict access where you administer the router (e.g. the home UniFi network). Installations in other households don't need one; the Pi is found by mDNS (ADR-010).
 - Administer installations in other households over Tailscale. Only administrators join the tailnet; household devices reach the app on their LAN.
 
 Home Wi-Fi/Ethernet is not an authentication system. Any device or person on the LAN should not automatically gain unrestricted write access.
@@ -28,12 +28,13 @@ Session cookies:
 
 Protect state-changing requests against CSRF. Validate `Origin`/`Host` and use a CSRF token strategy where needed. Apply login rate limiting and avoid revealing whether an account exists.
 
-## TLS and DNS credentials
+## TLS certificates
 
-- Certificates come from Let's Encrypt via DNS-01 (ADR-010). No client device installs a custom root certificate.
-- The DNS provider token is a root-only secret in `/etc/bbferm/dns.env`. It belongs to a DNS account and domain dedicated to BBFerm, because provider tokens can't be limited to one record.
-- Use one token per installation and revoke it when a Pi is lost, replaced, or decommissioned. Assume anyone with physical access to a Pi's SD card can read it.
-- Monitor certificate expiry and DNS update failures.
+- Certificates come from Caddy's local CA, chained to a root generated per installation (ADR-010).
+- Every root must carry a critical Name Constraints extension permitting only `DNS:bbferm.local` and excluding all IP addresses. Never install an unconstrained root on a client device: its key could impersonate any website to that device.
+- Verify the constraint before installing a root, and on each new client platform: a certificate it signs for another name must be rejected.
+- The root key lives in `/etc/bbferm/tls/root.key`, readable only by Caddy. Assume anyone with physical access to a Pi's SD card can read it; the name constraint limits that to impersonating `bbferm.local`.
+- Use a separate root per installation. When a Pi is lost or retired, remove its root from that household's devices.
 
 ## Service-to-service security
 
