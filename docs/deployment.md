@@ -8,7 +8,13 @@
 | `bbferm-collector.service` | Node.js        | Continuously receives Tilt BLE advertisements           |
 | `bbferm-store.service`     | Fastify        | Owns SQLite and exposes internal persistence API        |
 
-A reverse proxy such as Caddy terminates HTTPS and forwards to Start on loopback. Store is loopback-only. The collector only listens on loopback for its health check.
+| Supporting unit      | Responsibility                                                       |
+| -------------------- | -------------------------------------------------------------------- |
+| `caddy.service`      | Terminates HTTPS on the LAN and reverse-proxies to Start (ADR-010)   |
+| `bbferm-dns.timer`   | Updates the installation's DNS A record when the Pi's LAN IP changes |
+| `tailscaled.service` | Administrator access (SSH, deploys) to installations we don't host   |
+
+Caddy terminates HTTPS and forwards to Start on loopback. Store is loopback-only. The collector only listens on loopback for its health check.
 
 ## Filesystem
 
@@ -29,7 +35,11 @@ A reverse proxy such as Caddy terminates HTTPS and forwards to Start on loopback
   web.env
   store.env
   collector.env
-  tls/
+  install.env      # BBFERM_HOSTNAME=<install>.bbferm.example
+  dns.env          # DO_AUTH_TOKEN, root-only; read by Caddy and bbferm-dns
+
+/etc/caddy/Caddyfile
+/var/lib/caddy/    # Caddy-managed certificates and ACME account
 ```
 
 Keep persistent data and secrets outside versioned release directories.
@@ -68,7 +78,51 @@ Run services as unprivileged users, use environment files under `/etc/bbferm`, l
 
 ## HTTPS
 
-Use a DHCP reservation and hostname `bbferm.local`. PWA service workers require a secure context. Use a local CA/certificate trusted by each client device and document certificate installation and renewal.
+See ADR-010. Each installation is served at `https://<install>.bbferm.example` with a publicly trusted Let's Encrypt certificate, so client devices need no certificate installation. The real BBFerm domain is per-install configuration and is never committed.
+
+### Caddy
+
+Build Caddy with the DigitalOcean DNS module for Linux ARM64 (distro packages don't include DNS modules):
+
+```sh
+GOOS=linux GOARCH=arm64 xcaddy build --with github.com/caddy-dns/digitalocean
+```
+
+Install it as `caddy.service` with `EnvironmentFile=/etc/bbferm/install.env` and `/etc/bbferm/dns.env`, and `AmbientCapabilities=CAP_NET_BIND_SERVICE` so it can bind 80/443 without running as root.
+
+```caddyfile
+{$BBFERM_HOSTNAME} {
+	tls {
+		dns digitalocean {env.DO_AUTH_TOKEN}
+	}
+	reverse_proxy 127.0.0.1:3000
+}
+```
+
+Caddy obtains the certificate with the DNS-01 challenge, renews it automatically, and redirects HTTP to HTTPS. A web release does not restart Caddy; a Caddy restart does not touch the collector.
+
+### DNS credentials
+
+- Use a DigitalOcean account and domain dedicated to BBFerm. Provider tokens can't be scoped to one record, so this limits what a token extracted from a Pi can change.
+- Create a custom-scoped token with only domain read/update permissions. Store it in `/etc/bbferm/dns.env`, owned by root, mode `0600`.
+- Use a separate token per installation, named after it, so one can be revoked without affecting the others.
+
+### DNS record
+
+- The A record `<install>.bbferm.example` points to the Pi's private LAN IP, with a low TTL (60s).
+- The Pi keeps a dynamic DHCP address. `bbferm-dns.timer` runs every few minutes, compares the Pi's current LAN IP with the record, and updates it through the DigitalOcean API when they differ.
+- A DHCP reservation is optional. Use one where you administer the router.
+
+### Installing in a household
+
+1. Before installing, check that the household's router resolves a public name to a private IP. Some routers block this as DNS rebinding protection and need an exception for the BBFerm domain.
+2. Create the A record and a per-install DNS token.
+3. Install Caddy, `bbferm-dns.timer`, and Tailscale (administrator access only; household devices don't need it).
+4. From a household phone on Wi-Fi, open `https://<install>.bbferm.example` and confirm the certificate is valid and the PWA installs.
+
+### Monitoring
+
+Monitor certificate expiry and DNS update failures. Renewal and DNS updates need outbound internet; a short outage is harmless, a prolonged one eventually expires the certificate.
 
 ## Backups
 

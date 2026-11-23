@@ -17,9 +17,12 @@
 ## Milestone 2: Pi deployment foundation
 
 - Install Raspberry Pi OS Lite 64-bit.
-- Configure Ethernet, DHCP reservation, hostname, SSH keys, and Bluetooth.
+- Configure Ethernet, hostname, SSH keys, Bluetooth, and Tailscale for administrator access.
 - Install pinned Node runtime.
-- Configure local HTTPS and certificate trust.
+- Register the dedicated BBFerm domain and DigitalOcean DNS; create a per-install scoped token.
+- Build Caddy with the DigitalOcean DNS module; serve `https://<install>.bbferm.example` with a DNS-01 certificate (ADR-010).
+- Add `bbferm-dns.timer` to keep the A record pointed at the Pi's LAN IP.
+- On real devices over HTTPS, verify PWA install (iOS Safari, Android Chrome, desktop), offline app shell, update prompt, asset paths, and manifest content type.
 - Create service accounts and filesystem layout.
 - Deploy Start under `bbferm-web.service`.
 - Validate reboot, logs, memory use, and rollback.

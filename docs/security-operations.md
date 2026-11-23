@@ -7,7 +7,8 @@
 - Do not expose the SQLite file over SMB/NFS.
 - Do not expose the internal persistence API to the LAN.
 - Do not configure public port forwarding.
-- Use a UniFi DHCP reservation and firewall rules to restrict access where practical.
+- Use a DHCP reservation and firewall rules to restrict access where you administer the router (e.g. the home UniFi network). Installations in other households rely on the Pi updating its own DNS record instead (ADR-010).
+- Administer installations in other households over Tailscale. Only administrators join the tailnet; household devices reach the app on their LAN.
 
 Home Wi-Fi/Ethernet is not an authentication system. Any device or person on the LAN should not automatically gain unrestricted write access.
 
@@ -26,6 +27,13 @@ Session cookies:
 - bounded lifetime and server-side revocation
 
 Protect state-changing requests against CSRF. Validate `Origin`/`Host` and use a CSRF token strategy where needed. Apply login rate limiting and avoid revealing whether an account exists.
+
+## TLS and DNS credentials
+
+- Certificates come from Let's Encrypt via DNS-01 (ADR-010). No client device installs a custom root certificate.
+- The DNS provider token is a root-only secret in `/etc/bbferm/dns.env`. It belongs to a DNS account and domain dedicated to BBFerm, because provider tokens can't be limited to one record.
+- Use one token per installation and revoke it when a Pi is lost, replaced, or decommissioned. Assume anyone with physical access to a Pi's SD card can read it.
+- Monitor certificate expiry and DNS update failures.
 
 ## Service-to-service security
 

@@ -58,9 +58,39 @@
 - The BFF maps Store DTOs to browser DTOs.
 - Shared value types live in `@bbferm/domain`.
 
+## ADR-010: Publicly trusted HTTPS via Let's Encrypt DNS-01 on a dedicated domain
+
+**Context:** The PWA needs a secure context, and session cookies need `Secure`, so browser access must use HTTPS. Client devices must not need a custom root certificate. BBFerm may run in several households, each on a Pi we do not physically control and on a router we cannot configure.
+
+**Decision:**
+
+- Each installation gets its own hostname under a domain registered only for BBFerm (written `<install>.bbferm.example` in these docs; the real domain lives only in per-install config, never in the repo).
+- Caddy terminates HTTPS on the LAN interface (port 443), redirects HTTP to HTTPS, and reverse-proxies to Start on `127.0.0.1:3000`. Start, Store and the collector stay loopback-only.
+- Caddy obtains and renews a Let's Encrypt certificate with the ACME DNS-01 challenge through the DNS provider's API (DigitalOcean DNS, via the `caddy-dns/digitalocean` module). This needs a custom Caddy build, since distro packages ship without DNS modules.
+- The hostname's public A record points to the Pi's private LAN IP. The Pi keeps a dynamic DHCP address and updates its own A record when its LAN IP changes, using the same DNS credential and a low TTL.
+
+**Rationale:**
+
+- A public CA is the only way every phone and laptop trusts the certificate with no installation. Public CAs will not issue for `.local`, so a local CA (mkcert, step-ca, Caddy `tls internal`) would require installing its root on every client device, which is unacceptable for other households.
+- DNS-01 proves domain control without exposing the Pi to the internet or forwarding ports.
+- DNS provider API tokens cannot be scoped to a single record or domain. A token on a Pi in someone else's house can be extracted from its SD card. A domain and DNS account dedicated to BBFerm limits a leaked token to BBFerm hostnames.
+- Self-updating DNS records avoid depending on DHCP reservations in routers we do not administer.
+- Caddy handles issuance, renewal, redirects and the privileged port, and keeps Start on loopback, for roughly 30–50 MB of RAM (estimate, to verify on the Pi). Terminating TLS in srvx would save that memory but move ACME, renewal restarts and LAN binding into our own scripts and the web service.
+
+**Consequences:**
+
+- Each Pi needs outbound internet access to renew certificates (Let's Encrypt lifetimes are short and shrinking) and to update its DNS record. A short outage is harmless; a prolonged one eventually expires the certificate. Monitor certificate expiry.
+- Routers with DNS rebinding protection may refuse public names that resolve to private IPs. Check this before installing in a household; it needs a router exception and cannot be fixed remotely.
+- Hostnames appear in public Certificate Transparency logs. They reveal only that an installation exists.
+- The DNS token is a root-only secret under `/etc/bbferm/` on each Pi. Rotate it if a Pi is lost or decommissioned.
+- Each installation is independent: its own hostname, certificate, database and accounts. Nothing syncs between installations.
+- Administering remote installations (SSH, deploys, logs) uses Tailscale on the Pi, for administrators only. Household users never need Tailscale; the app is served on their LAN.
+- Browser login is required: another household's LAN cannot be treated as trusted.
+
+**Alternatives considered:** plain HTTP (no PWA, no `Secure` cookies, credentials in clear text on Wi-Fi); a local CA (root certificate install on every device); Tailscale HTTPS certificates (every household device would need Tailscale); a static IP or DHCP reservation (requires administering each household's router); reusing an existing personal domain (a leaked token would expose all of its DNS).
+
 ## Open questions
 
-- Local CA and certificate trust workflow for `https://bbferm.local`.
 - Single-user or multi-user authentication.
 - SQLite driver and BLE library selection after Pi tests.
 - Tilt-to-batch assignment and reassignment history.
