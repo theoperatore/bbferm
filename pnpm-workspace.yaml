@@ -1,0 +1,9 @@
+packages:
+  - src/apps/*
+  - src/services/collector
+  - src/services/store/*
+  - src/packages/*
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp

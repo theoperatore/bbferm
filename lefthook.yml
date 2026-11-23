@@ -1,0 +1,7 @@
+# Git hooks, installed by `pnpm install` (the `prepare` script runs `lefthook install`).
+pre-commit:
+  jobs:
+    - name: biome
+      # Lint + format check on staged files only. Doesn't modify files; run `pnpm format` to fix.
+      run: pnpm exec biome check --staged --no-errors-on-unmatched --files-ignore-unknown=true
+      fail_text: Biome found lint or formatting problems. Run `pnpm format`, fix any remaining lint errors, then re-stage.

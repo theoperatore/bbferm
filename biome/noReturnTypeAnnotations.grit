@@ -1,0 +1,14 @@
+language js(typescript, jsx)
+
+// Let TypeScript infer return types. Annotate variables instead when a value
+// needs a named type. Interface/type member signatures are not affected.
+or {
+  JsFunctionDeclaration(return_type_annotation=$annotation),
+  JsFunctionExpression(return_type_annotation=$annotation),
+  JsArrowFunctionExpression(return_type_annotation=$annotation),
+  JsMethodObjectMember(return_type_annotation=$annotation),
+  JsMethodClassMember(return_type_annotation=$annotation)
+} where {
+  $annotation <: not .,
+  register_diagnostic(span=$annotation, message="Don't annotate return types; let TypeScript infer them.")
+}

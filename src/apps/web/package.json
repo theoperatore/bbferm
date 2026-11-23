@@ -1,0 +1,42 @@
+{
+  "name": "@bbferm/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "BBFerm web app and BFF (TanStack Start, SPA mode)",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "srvx --prod --host 127.0.0.1 --port 3000 -s ../client dist/server/server.js",
+    "typecheck": "tsc --noEmit",
+    "generate-pwa-assets": "pwa-assets-generator"
+  },
+  "dependencies": {
+    "@bbferm/domain": "workspace:*",
+    "@bbferm/http-client": "workspace:*",
+    "@bbferm/store-schema": "workspace:*",
+    "@mantine/core": "^9.8.2",
+    "@mantine/hooks": "^9.8.2",
+    "@tanstack/react-query": "^5.108.2",
+    "@tanstack/react-router": "^1.170.46",
+    "@tanstack/react-start": "^1.169.7",
+    "dotenv": "^18.0.10",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "srvx": "^1.0.8",
+    "workbox-window": "^7.4.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@bbferm/config": "workspace:*",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vite-pwa/assets-generator": "^2.0.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "postcss": "^8.5.0",
+    "postcss-preset-mantine": "^1.18.0",
+    "postcss-simple-vars": "^7.0.1",
+    "vite": "^8.3.8",
+    "vite-plugin-pwa": "^2.0.0"
+  }
+}

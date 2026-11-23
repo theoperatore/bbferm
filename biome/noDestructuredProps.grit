@@ -1,0 +1,11 @@
+language js(typescript, jsx)
+
+// React components take `(props: Props)` and destructure inside the body.
+or {
+  JsFunctionDeclaration(id=$name, parameters=$params),
+  JsVariableDeclarator(id=$name, initializer=JsInitializerClause(expression=JsArrowFunctionExpression(parameters=$params)))
+} where {
+  $name <: r"^[A-Z][A-Za-z0-9]*$",
+  $params <: contains JsObjectBindingPattern() as $pattern,
+  register_diagnostic(span=$pattern, message="Components take `(props: Props)` and destructure inside the body, not in the parameter list.")
+}

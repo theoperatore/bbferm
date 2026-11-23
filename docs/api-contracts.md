@@ -7,9 +7,25 @@ BBFerm has two boundaries:
 
 The browser must never call Store directly. Store is loopback-only and is not a public API.
 
+## Schema ownership
+
+Each API provider owns, validates, and publishes its own schemas. Consumers depend on the provider's published schema, never the reverse, and never on a shared grab-bag package.
+
+| Provider             | Published schema                                      | Consumers                 |
+| -------------------- | ----------------------------------------------------- | ------------------------- |
+| Store                | `@bbferm/store-schema` (`src/services/store/schema`)  | BFF, collector            |
+| BFF (TanStack Start) | `*.schemas.ts` files in the web app's feature modules | Browser UI (same package) |
+
+- Store's schema package depends only on `zod` and `@bbferm/domain`, so consumers never install Fastify or the SQLite driver.
+- The BFF translates Store DTOs into its own browser DTOs. Store shapes, raw sensor payloads, and internal metadata never reach the browser.
+- The UI imports BFF schemas and types only; it must not import `@bbferm/store-schema`.
+- Shared value types (IDs, UTC timestamps, gravity, measurement sources, quality flags) live in `@bbferm/domain`. Providers build their schemas from them.
+- Providers keep versioned schemas backward compatible because consumers deploy independently. Adding fields is safe because consumers strip unknown keys. Removing or renaming fields requires a new version (`/internal/v2`).
+
 ## Browser-facing BFF
 
 Use Start server functions for UI operations:
+
 - Read status, devices, batches, recipes, and measurements.
 - Create/update recipes and batches.
 - Add brew events and manual measurements.
@@ -21,19 +37,19 @@ Use Start server routes for conventional HTTP endpoints where useful, such as `G
 
 Prefix: `/internal/v1`. Bind to loopback only or a permission-protected Unix socket. Require a service credential or equivalent local authentication.
 
-| Method | Path | Caller | Purpose |
-|---|---|---|---|
-| GET | `/internal/v1/health` | Start, collector | Readiness/liveness |
-| GET | `/internal/v1/status` | Start | DB/schema status |
-| POST | `/internal/v1/measurements` | Collector | Idempotent Tilt ingestion |
-| GET | `/internal/v1/measurements/latest` | Start | Latest readings |
-| GET | `/internal/v1/measurements` | Start | Bounded history query |
-| GET/POST | `/internal/v1/devices` | Start | Device management |
-| GET/POST | `/internal/v1/batches` | Start | Batch operations |
-| GET/PATCH | `/internal/v1/batches/{id}` | Start | Batch detail/update |
-| GET/POST | `/internal/v1/recipes` | Start | Recipe operations |
-| POST | `/internal/v1/events` | Start | Brew event creation |
-| POST | `/internal/v1/measurements/manual` | Start | Manual measurement |
+| Method    | Path                               | Caller           | Purpose                   |
+| --------- | ---------------------------------- | ---------------- | ------------------------- |
+| GET       | `/internal/v1/health`              | Start, collector | Readiness/liveness        |
+| GET       | `/internal/v1/status`              | Start            | DB/schema status          |
+| POST      | `/internal/v1/measurements`        | Collector        | Idempotent Tilt ingestion |
+| GET       | `/internal/v1/measurements/latest` | Start            | Latest readings           |
+| GET       | `/internal/v1/measurements`        | Start            | Bounded history query     |
+| GET/POST  | `/internal/v1/devices`             | Start            | Device management         |
+| GET/POST  | `/internal/v1/batches`             | Start            | Batch operations          |
+| GET/PATCH | `/internal/v1/batches/{id}`        | Start            | Batch detail/update       |
+| GET/POST  | `/internal/v1/recipes`             | Start            | Recipe operations         |
+| POST      | `/internal/v1/events`              | Start            | Brew event creation       |
+| POST      | `/internal/v1/measurements/manual` | Start            | Manual measurement        |
 
 Use stable DTOs and runtime validation at every boundary. Do not expose raw SQL rows or arbitrary query endpoints.
 

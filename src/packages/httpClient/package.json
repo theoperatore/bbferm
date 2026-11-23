@@ -1,0 +1,28 @@
+{
+  "name": "@bbferm/http-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared fetch client for calling BBFerm services: schema-validated responses and typed errors",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "@bbferm/source": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@bbferm/config": "workspace:*"
+  }
+}

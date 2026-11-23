@@ -1,0 +1,25 @@
+{
+  "name": "@bbferm/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Framework-independent brewing domain logic",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "@bbferm/source": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@bbferm/config": "workspace:*"
+  }
+}

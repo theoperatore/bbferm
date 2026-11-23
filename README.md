@@ -4,20 +4,20 @@ A local-first homebrewing application for recipe management, brew-day logging, a
 
 ## Technology decisions
 
-| Area                             | Choice                                                     |
-| -------------------------------- | ---------------------------------------------------------- |
-| Full-stack web framework and BFF | **TanStack Start**                                         |
-| Rendering mode                   | **SPA mode**; SSR is not required                          |
-| UI                               | React + TypeScript + Mantine                               |
-| Routing                          | TanStack Router (included with Start)                      |
-| Client server-state              | TanStack Query                                             |
-| PWA                              | Web app manifest + service worker / Workbox integration    |
-| Collector                        | Separate Node.js/TypeScript BLE listener                   |
-| Persistence API                  | Separate Fastify service                                   |
-| Database                         | SQLite, opened only by the persistence service             |
-| Shared contracts                 | TypeScript runtime schemas and DTOs in a workspace package |
-| Process supervision              | systemd                                                    |
-| Deployment                       | Direct Linux services; no Docker                           |
+| Area                             | Choice                                                  |
+| -------------------------------- | ------------------------------------------------------- |
+| Full-stack web framework and BFF | **TanStack Start**                                      |
+| Rendering mode                   | **SPA mode**; SSR is not required                       |
+| UI                               | React + TypeScript + Mantine                            |
+| Routing                          | TanStack Router (included with Start)                   |
+| Client server-state              | TanStack Query                                          |
+| PWA                              | Web app manifest + service worker / Workbox integration |
+| Collector                        | Separate Node.js/TypeScript BLE listener                |
+| Persistence API                  | Separate Fastify service                                |
+| Database                         | SQLite, opened only by the persistence service          |
+| API schemas                      | Owned and published by each API provider (Zod)          |
+| Process supervision              | systemd                                                 |
+| Deployment                       | Direct Linux services; no Docker                        |
 
 ## Architecture
 
@@ -64,6 +64,39 @@ The browser talks only to TanStack Start. Start and the collector talk to Store 
 - Tilt hydrometer(s), received using onboard Bluetooth LE.
 
 Cloud synchronization, remote access, Docker, and automated CI/CD are also out of the initial release scope.
+
+## Getting started
+
+Requires Node.js 24 (`.nvmrc`) and pnpm 10.
+
+```sh
+pnpm install
+cp src/services/store/server/.env.example src/services/store/server/.env
+cp src/services/collector/.env.example src/services/collector/.env
+cp src/apps/web/.env.example src/apps/web/.env
+
+pnpm dev:store       # Fastify Store on 127.0.0.1:3100 (health only until M3)
+pnpm dev:collector   # health endpoint on 127.0.0.1:3200 (BLE collection comes in M4)
+pnpm dev:web         # TanStack Start on 127.0.0.1:3000
+```
+
+```sh
+pnpm typecheck && pnpm test && pnpm build
+pnpm --filter @bbferm/web start   # serve the production web build (PWA + BFF)
+```
+
+| Path                        | Package                | Purpose                                                                        |
+| --------------------------- | ---------------------- | ------------------------------------------------------------------------------ |
+| `src/apps/web`              | `@bbferm/web`          | TanStack Start SPA + BFF, Mantine, TanStack Query, PWA                         |
+| `src/services/store/server` | `@bbferm/store`        | Fastify internal API (`/internal/v1`), sole SQLite owner                       |
+| `src/services/store/schema` | `@bbferm/store-schema` | Store's published API schemas (Zod only), used by the BFF and collector        |
+| `src/services/collector`    | `@bbferm/collector`    | Tilt BLE listener (health endpoint only until M4)                              |
+| `src/packages/domain`       | `@bbferm/domain`       | Framework-independent brewing logic and value types (IDs, timestamps, gravity) |
+| `src/packages/httpServer`   | `@bbferm/http-server`  | Shared Fastify server: error envelope, health checks, start/stop               |
+| `src/packages/httpClient`   | `@bbferm/http-client`  | Shared fetch client: schema-validated responses, typed errors                  |
+| `src/packages/config`       | `@bbferm/config`       | Shared TypeScript presets                                                      |
+
+Workspace packages export TypeScript source under the `@bbferm/source` condition (used by Vite and `tsx` in dev) and compiled `dist/` otherwise (used by the built services).
 
 ## Documentation
 

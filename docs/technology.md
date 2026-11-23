@@ -27,13 +27,21 @@ Use a manifest and service worker, likely with Workbox tooling. Confirm compatib
 ## Independent backend services
 
 ### Collector
+
 Standalone Node.js/TypeScript process. Listens for Tilt BLE advertisements through Linux BlueZ and submits measurements to Store. Test the selected BLE library on the actual Pi early.
 
 ### Store
+
 Standalone Fastify service. Owns SQLite, migrations, transactions, and persistence DTOs. It is the only process allowed to open the database.
 
 ### Shared packages
-Use pnpm workspaces. Put runtime validation schemas and API DTOs in a shared `packages/contracts` package. Keep domain logic framework-independent where practical.
+
+Use pnpm workspaces. API schemas are owned by the provider of each API, not by a shared package (see [API contracts](api-contracts.md#schema-ownership)):
+
+- Store publishes `@bbferm/store-schema`, consumed by the BFF and the collector.
+- The BFF's browser-facing schemas live in `*.schemas.ts` files in the web app's feature modules, consumed by the UI.
+
+Shared value types (IDs, UTC timestamps, specific gravity) and framework-independent domain logic live in `@bbferm/domain`.
 
 ## Suggested monorepo
 
@@ -43,15 +51,19 @@ bbferm/
 ├── docs/
 ├── package.json
 ├── pnpm-workspace.yaml
-├── apps/
-│   └── web/                 # TanStack Start: SPA + BFF
-├── services/
-│   ├── collector/           # standalone BLE listener
-│   └── store/               # Fastify + SQLite
-├── packages/
-│   ├── contracts/           # runtime schemas and DTOs
-│   ├── domain/              # shared domain logic
-│   └── config/
+├── src/
+│   ├── apps/
+│   │   └── web/             # TanStack Start: SPA + BFF
+│   ├── services/
+│   │   ├── collector/       # standalone BLE listener
+│   │   └── store/
+│   │       ├── schema/      # Store's published API schema
+│   │       └── server/      # Fastify + SQLite
+│   └── packages/
+│       ├── domain/          # domain logic and value types
+│       ├── httpServer/      # shared Fastify server: health, error envelope, start/stop
+│       ├── httpClient/      # shared fetch client for service-to-service calls
+│       └── config/
 └── scripts/
     ├── build-release.sh
     ├── deploy-release.sh
