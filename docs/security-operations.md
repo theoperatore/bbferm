@@ -36,6 +36,14 @@ Protect state-changing requests against CSRF. Validate `Origin`/`Host` and use a
 - The root key lives in `/etc/bbferm/tls/root.key`, readable only by Caddy. Assume anyone with physical access to a Pi's SD card can read it; the name constraint limits that to impersonating `bbferm.local`.
 - Use a separate root per installation. When a Pi is lost or retired, remove its root from that household's devices.
 
+## Remote administration
+
+- Pis join the tailnet as tagged devices (`tag:bbferm`). The tailnet policy allows administrators to reach them on SSH only, and allows Pis to initiate nothing. A compromised Pi must not reach administrators' devices, other Pis, or the home network.
+- Use Tailscale SSH in `check` mode, so a session needs a recent re-authentication.
+- The identity provider account used to log into Tailscale is effectively the key to every Pi. Protect it with multi-factor authentication.
+- Disable node key expiry for remote Pis, and remove a Pi from the tailnet when it is retired or lost.
+- Do not upgrade Tailscale on remote Pis unattended; test upgrades on the home Pi first.
+
 ## Service-to-service security
 
 - Persistence API listens only on loopback or a Unix socket.

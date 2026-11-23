@@ -159,14 +159,75 @@ Then open `https://bbferm.local`, confirm there is no certificate warning, and i
 
 ### Installing in a household
 
+Before the Pi leaves your house:
+
+1. Create the installation's root and copy it to the Pi.
+2. Install Caddy.
+3. Join the Pi to the tailnet and confirm SSH over Tailscale works (see [Remote administration](#remote-administration-tailscale)).
+
+At the household:
+
 1. Check that mDNS works on the household network: from a phone on Wi-Fi, `bbferm.local` must resolve. Guest networks and Wi-Fi client isolation block multicast.
-2. Create the installation's root and copy it to the Pi.
-3. Install Caddy and Tailscale (administrator access only; household devices don't need it).
-4. Install the root on each household device and confirm the PWA installs.
+2. Plug in the Pi and confirm it appears online in the tailnet.
+3. Install the root on each household device and confirm the PWA installs.
 
 ### Retiring an installation
 
-Remove its root from that household's devices. If a Pi is lost, its key can only impersonate `bbferm.local` to that household's devices; still remove the root and issue a new one for the replacement Pi.
+Remove its root from that household's devices, and remove the Pi from the tailnet in the Tailscale admin console. If a Pi is lost, its key can only impersonate `bbferm.local` to that household's devices; still remove the root and issue a new one for the replacement Pi.
+
+## Remote administration (Tailscale)
+
+Pis in other households are administered over Tailscale: SSH, deploys and logs. Tailscale builds WireGuard tunnels between tailnet devices using outbound connections only, so it needs no port forwarding or router changes and works behind NAT and CGNAT. When a direct path fails, traffic relays through Tailscale's DERP servers, still end-to-end encrypted. Only administrators' devices and the Pis join the tailnet; household devices never need Tailscale.
+
+### Joining a Pi
+
+Do this before the Pi leaves your house:
+
+```sh
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up --ssh --hostname bbferm-<install> --advertise-tags tag:bbferm
+```
+
+- `--hostname` sets the tailnet (MagicDNS) name. Every Pi's OS hostname is `bbferm` for `bbferm.local`, so each needs a distinct tailnet name, or Tailscale renames duplicates to `bbferm-1`, `bbferm-2`.
+- `--ssh` enables Tailscale SSH: logins are authorized by tailnet identity and the policy below, so there are no `authorized_keys` to distribute. Plain `ssh`, `scp` and `rsync` keep working.
+- `--advertise-tags tag:bbferm` makes the Pi a tagged device, so the policy treats it as infrastructure rather than as you.
+
+Then, in the Tailscale admin console:
+
+- **Disable key expiry** for the machine. Node keys expire after 180 days by default; on a remote Pi that locks you out until someone in the household re-authenticates it. Tagged devices normally have expiry disabled, but check.
+- Confirm `ssh admin@bbferm-<install>` works from your laptop over Tailscale before you leave.
+
+At the household, the Pi joins their network, connects out to Tailscale, and appears in the tailnet. Nothing on their side needs configuring.
+
+### Tailnet policy
+
+The default policy lets every tailnet device reach every other. Restrict it so administrators can reach the Pis on SSH, and the Pis can initiate nothing, not even to each other:
+
+```json
+{
+  "tagOwners": { "tag:bbferm": ["autogroup:admin"] },
+  "acls": [{ "action": "accept", "src": ["autogroup:member"], "dst": ["tag:bbferm:22"] }],
+  "ssh": [{ "action": "check", "src": ["autogroup:member"], "dst": ["tag:bbferm"], "users": ["admin"] }]
+}
+```
+
+`check` requires a recent browser re-authentication before an SSH session starts.
+
+### Day-to-day use
+
+```sh
+ssh admin@bbferm-<install>
+journalctl -u bbferm-web -f
+```
+
+The release procedure above works unchanged over Tailscale: transfer artifacts with `rsync`/`scp`, switch the release, restart only the affected service.
+
+### Operating notes
+
+- If the household's internet is down, the Pi is unreachable. BBFerm keeps working for them on the LAN; recovery may mean asking them to power-cycle the Pi.
+- Upgrade Tailscale deliberately, not through unattended upgrades: a broken upgrade on a remote Pi cuts off access. Test a new version on the home Pi first.
+- Measure `tailscaled` memory on the Pi Zero in M2 alongside Caddy (expected to be a few tens of MB).
+- The free Personal plan covers a handful of Pis plus administrator devices.
 
 ## Backups
 
