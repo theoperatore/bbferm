@@ -24,7 +24,8 @@ function pwaAfterStartBuild(pwaPlugins: Plugin[]) {
   return plugin;
 }
 
-// TODO(M2): behind Caddy over HTTPS, verify asset paths, SW scope, and that manifest.webmanifest is served as application/manifest+json.
+// TODO(M2): behind Caddy at https://bbferm.local, verify asset paths, SW scope, and that manifest.webmanifest
+// is served as application/manifest+json (srvx serves it as application/octet-stream; Caddy may need a header rule).
 const pwa = VitePWA({
   outDir: 'dist/client',
   registerType: 'prompt',

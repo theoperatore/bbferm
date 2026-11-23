@@ -17,12 +17,16 @@
 ## Milestone 2: Pi deployment foundation
 
 - Install Raspberry Pi OS Lite 64-bit.
-- Configure Ethernet, DHCP reservation, hostname, SSH keys, and Bluetooth.
+- Configure Ethernet, hostname, SSH keys, and Bluetooth.
+- Join the Pi to the tailnet as `tag:bbferm` with Tailscale SSH, disable key expiry, and apply the tailnet policy; confirm SSH and a web release work over Tailscale.
 - Install pinned Node runtime.
-- Configure local HTTPS and certificate trust.
+- Create the installation's name-constrained root and confirm it rejects other names and IP addresses (ADR-010).
+- Install Caddy with `tls internal` using that root; serve `https://bbferm.local` and confirm the served chain ends at the root.
+- Install the root on client devices (iOS, Android, macOS, Windows) and confirm each platform rejects a certificate for another name signed by it.
+- On real devices over HTTPS, verify PWA install (iOS Safari, Android Chrome, desktop), offline app shell, update prompt, asset paths, and manifest content type.
 - Create service accounts and filesystem layout.
 - Deploy Start under `bbferm-web.service`.
-- Validate reboot, logs, memory use, and rollback.
+- Validate reboot, logs, memory use (including Caddy and `tailscaled`), and rollback.
 
 ## Milestone 3: Store and SQLite
 

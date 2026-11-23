@@ -6,7 +6,8 @@ export const Route = createFileRoute('/')({
   component: HomePage,
 });
 
-// TODO(M1): on a production build served over HTTPS, verify PWA install, offline app-shell load, and the update prompt.
+// TODO(M2): verified locally on the production build (M1); repeat PWA install, offline app-shell load, and the update prompt
+// on real devices over HTTPS.
 // TODO(M5): replace with the fermentation dashboard once Store serves measurements.
 function HomePage() {
   return (

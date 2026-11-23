@@ -7,7 +7,8 @@
 - Do not expose the SQLite file over SMB/NFS.
 - Do not expose the internal persistence API to the LAN.
 - Do not configure public port forwarding.
-- Use a UniFi DHCP reservation and firewall rules to restrict access where practical.
+- Use a DHCP reservation and firewall rules to restrict access where you administer the router (e.g. the home UniFi network). Installations in other households don't need one; the Pi is found by mDNS (ADR-010).
+- Administer installations in other households over Tailscale. Only administrators join the tailnet; household devices reach the app on their LAN.
 
 Home Wi-Fi/Ethernet is not an authentication system. Any device or person on the LAN should not automatically gain unrestricted write access.
 
@@ -26,6 +27,22 @@ Session cookies:
 - bounded lifetime and server-side revocation
 
 Protect state-changing requests against CSRF. Validate `Origin`/`Host` and use a CSRF token strategy where needed. Apply login rate limiting and avoid revealing whether an account exists.
+
+## TLS certificates
+
+- Certificates come from Caddy's local CA, chained to a root generated per installation (ADR-010).
+- Every root must carry a critical Name Constraints extension permitting only `DNS:bbferm.local` and excluding all IP addresses. Never install an unconstrained root on a client device: its key could impersonate any website to that device.
+- Verify the constraint before installing a root, and on each new client platform: a certificate it signs for another name must be rejected.
+- The root key lives in `/etc/bbferm/tls/root.key`, readable only by Caddy. Assume anyone with physical access to a Pi's SD card can read it; the name constraint limits that to impersonating `bbferm.local`.
+- Use a separate root per installation. When a Pi is lost or retired, remove its root from that household's devices.
+
+## Remote administration
+
+- Pis join the tailnet as tagged devices (`tag:bbferm`). The tailnet policy allows administrators to reach them on SSH only, and allows Pis to initiate nothing. A compromised Pi must not reach administrators' devices, other Pis, or the home network.
+- Use Tailscale SSH in `check` mode, so a session needs a recent re-authentication.
+- The identity provider account used to log into Tailscale is effectively the key to every Pi. Protect it with multi-factor authentication.
+- Disable node key expiry for remote Pis, and remove a Pi from the tailnet when it is retired or lost.
+- Do not upgrade Tailscale on remote Pis unattended; test upgrades on the home Pi first.
 
 ## Service-to-service security
 

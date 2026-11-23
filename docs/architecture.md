@@ -96,14 +96,14 @@ Suggested ports:
 
 | Process                 | Bind address  | Port |
 | ----------------------- | ------------- | ---: |
-| HTTPS reverse proxy     | LAN interface |  443 |
+| Caddy (HTTPS)           | LAN interface |  443 |
 | TanStack Start          | `127.0.0.1`   | 3000 |
 | Fastify Store           | `127.0.0.1`   | 3100 |
 | Collector (health only) | `127.0.0.1`   | 3200 |
 
-Only HTTPS is reachable from the LAN. Internal service ports are loopback-only. Use a DHCP reservation and local hostname such as `bbferm.local`.
+Only HTTPS is reachable from the LAN (Caddy also listens on port 80 to redirect to HTTPS). Internal service ports are loopback-only.
 
-PWA service workers require a secure context. Plain `http://bbferm.local` is not sufficient in normal browsers. Use a local CA/certificate trusted by each device, or another appropriate HTTPS arrangement.
+PWA service workers and `Secure` session cookies require a secure context, so plain HTTP is not sufficient. Each installation is served at `https://bbferm.local` (mDNS) with a certificate from Caddy's local CA. The CA's root is generated per installation and name-constrained to `bbferm.local`, and each client device installs it once. See ADR-010 and `deployment.md`.
 
 ## PWA and offline behavior
 
