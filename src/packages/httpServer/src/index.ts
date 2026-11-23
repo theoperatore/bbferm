@@ -1,4 +1,3 @@
-export * from './errorEnvelope.js'
-export * from './health.js'
-export * from './httpServer.js'
-export * from './lifecycle.js'
+export { sendError } from './errorEnvelope.js';
+export type { HealthService } from './health.js';
+export { createHttpServer, type HttpServer } from './httpServer.js';

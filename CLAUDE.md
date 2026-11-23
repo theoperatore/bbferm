@@ -42,7 +42,12 @@ Each API provider owns and publishes its schema; there is no shared cross-servic
 
 ### Shared HTTP packages
 
-- **`@bbferm/http-server`** (`src/packages/httpServer`): the Fastify setup every backend service uses. It provides `createHttpServer` (error envelope + 404), `createHealthService` / `createGetHealthHandler`, `sendError`, and `startHttpServer` (listen, then `serving`; SIGINT/SIGTERM, then `not_serving` and close). Only backend services depend on it.
+- **`@bbferm/http-server`** (`src/packages/httpServer`): the Fastify setup every backend service uses.
+  - `createHttpServer({ logLevel, version, healthPath })` returns `{ fastify, health, route, start }`. It adds the error envelope, 404 handling and the health route (`GET healthPath`, default `/health`).
+    - `route(options)` registers a route and returns the server, so calls chain: `await createHttpServer(...).route(createXHandler(deps)).start({ host, port })`.
+    - `start({ host, port })` listens, then sets `serving`. On SIGINT/SIGTERM it sets `not_serving` and closes.
+    - `health.setNotServing()` is for a fatal dependency failure. `fastify` is an escape hatch, e.g. `fastify.inject` in tests.
+  - It also exports `sendError`. Only backend services depend on this package.
 - **`@bbferm/http-client`** (`src/packages/httpClient`): the fetch client every `clients/<service>/client.ts` builds on. It sends an optional bearer token, applies a timeout, parses responses with the provider's schema, and throws `HttpRequestRejectedError` (4xx, don't retry) or `HttpServiceUnavailableError` (unreachable/5xx/408/429, retryable). It has no Fastify dependency.
 - Wire shapes (health response, error envelope) are still published by each provider's schema package. Store's tests check that the shared server's output parses with `@bbferm/store-schema`.
 

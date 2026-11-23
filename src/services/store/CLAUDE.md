@@ -33,14 +33,14 @@ All wiring happens in `main.ts`, in this order:
 2. Create clients.
 3. Create stores (connections, then DAOs).
 4. Create services from stores, clients, and other services.
-5. Create the server (`createHttpServer`) and handlers from services; register each handler as a route, including `createGetHealthHandler`.
-6. Call `startHttpServer`, which listens and **then** sets health to `serving`.
+5. Create the server with `createHttpServer({ ..., healthPath: storeRoutes.health })`, which registers the health route itself. Chain `.route(create<Name>Handler(deps))` for each handler.
+6. Chain `.start({ host, port })`, which listens and **then** sets health to `serving`.
 
 Every piece is a factory that takes its dependencies as a single `deps` object. Nothing constructs its own dependencies or reads `process.env` outside `config.ts`.
 
 Health starts `not_serving` (HTTP 503) and flips to `serving` only after `listen()` resolves. On SIGINT/SIGTERM it returns to `not_serving` before the server closes.
 
-Tests build the same graph without listening (see `server/test/app.test.ts`) and exercise routes with `server.inject`. Keep that wiring in step with `main.ts`. They also check that responses parse with `@bbferm/store-schema`, so the published schema can't drift from what the server returns.
+Tests build the same graph without listening (see `server/test/app.test.ts`) and exercise routes with `server.fastify.inject`. Keep that wiring in step with `main.ts`. They also check that responses parse with `@bbferm/store-schema`, so the published schema can't drift from what the server returns.
 
 ## Conventions
 

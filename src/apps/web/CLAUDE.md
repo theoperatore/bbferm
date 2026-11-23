@@ -56,11 +56,11 @@ src/
 
   ```tsx
   type Props = {
-    reading: Reading
-  }
+    reading: Reading;
+  };
 
   export function ReadingCard(props: Props) {
-    const { reading } = props
+    const { reading } = props;
     // ...
   }
   ```
@@ -82,14 +82,14 @@ Every call the web server makes to an upstream service goes through `src/clients
   export interface IGetHealthRequest {}
 
   export type GetHealthResponse = {
-    status: 'serving' | 'not_serving'
-    version: string
-    time: string
-  }
+    status: 'serving' | 'not_serving';
+    version: string;
+    time: string;
+  };
 
   export async function getHealth(request: IGetHealthRequest) {
-    const response: GetHealthResponse = await storeClient().get(storeRoutes.health, StoreHealthResponse)
-    return response
+    const response: GetHealthResponse = await storeClient().get(storeRoutes.health, StoreHealthResponse);
+    return response;
   }
   ```
 

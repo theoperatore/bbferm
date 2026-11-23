@@ -1,4 +1,4 @@
-import type { FastifyReply } from 'fastify'
+import type { FastifyReply } from 'fastify';
 
 /**
  * Sends the shared error envelope: `{ error: { code, message, requestId } }`.
@@ -6,5 +6,5 @@ import type { FastifyReply } from 'fastify'
  * Never include stack traces, SQL, paths, or secrets.
  */
 export function sendError(reply: FastifyReply, status: number, code: string, message: string) {
-  return reply.code(status).send({ error: { code, message, requestId: reply.request.id } })
+  return reply.code(status).send({ error: { code, message, requestId: reply.request.id } });
 }

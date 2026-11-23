@@ -1,14 +1,14 @@
-import { useRegisterSW } from 'virtual:pwa-register/react'
-import { Button, Group, Notification } from '@mantine/core'
+import { useRegisterSW } from 'virtual:pwa-register/react';
+import { Button, Group, Notification } from '@mantine/core';
 
 /** Registers the service worker and offers a reload when a new version is ready. */
 export function PwaUpdatePrompt() {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
-  } = useRegisterSW()
+  } = useRegisterSW();
 
-  if (!needRefresh) return null
+  if (!needRefresh) return null;
 
   return (
     <Notification
@@ -22,5 +22,5 @@ export function PwaUpdatePrompt() {
         </Button>
       </Group>
     </Notification>
-  )
+  );
 }

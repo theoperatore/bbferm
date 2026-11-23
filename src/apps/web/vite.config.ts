@@ -1,7 +1,7 @@
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
-import { defaultClientConditions, defaultServerConditions, defineConfig, type Plugin } from 'vite'
-import { type VitePluginPWAAPI, VitePWA } from 'vite-plugin-pwa'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import viteReact from '@vitejs/plugin-react';
+import { defaultClientConditions, defaultServerConditions, defineConfig, type Plugin } from 'vite';
+import { type VitePluginPWAAPI, VitePWA } from 'vite-plugin-pwa';
 
 /**
  * Start builds the client and server environments and then prerenders the SPA
@@ -11,8 +11,8 @@ import { type VitePluginPWAAPI, VitePWA } from 'vite-plugin-pwa'
  * fallback.
  */
 function pwaAfterStartBuild(pwaPlugins: Plugin[]) {
-  const api = pwaPlugins.find((p) => p.name === 'vite-plugin-pwa')?.api as VitePluginPWAAPI | undefined
-  if (!api) throw new Error('vite-plugin-pwa API not found')
+  const api = pwaPlugins.find((p) => p.name === 'vite-plugin-pwa')?.api as VitePluginPWAAPI | undefined;
+  if (!api) throw new Error('vite-plugin-pwa API not found');
   const plugin: Plugin = {
     name: 'bbferm:pwa-after-start-build',
     apply: 'build',
@@ -20,8 +20,8 @@ function pwaAfterStartBuild(pwaPlugins: Plugin[]) {
     // this plugin is registered after it, so it runs once the shell exists.
     enforce: 'post',
     buildApp: { order: 'post', handler: () => api.generateSW() },
-  }
-  return plugin
+  };
+  return plugin;
 }
 
 // TODO(M2): behind Caddy over HTTPS, verify asset paths, SW scope, and that manifest.webmanifest is served as application/manifest+json.
@@ -53,7 +53,7 @@ const pwa = VitePWA({
     navigateFallbackDenylist: [/^\/_serverFn\//, /^\/api\//],
     runtimeCaching: [],
   },
-})
+});
 
 export default defineConfig({
   server: { port: 3000, host: '127.0.0.1' },
@@ -70,4 +70,4 @@ export default defineConfig({
     pwa,
     pwaAfterStartBuild(pwa),
   ],
-})
+});

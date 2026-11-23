@@ -21,7 +21,7 @@ The HTTP server, health checks and start/stop handling come from `@bbferm/http-s
 2. Clients.
 3. Stores.
 4. Services.
-5. Handlers registered to routes (and later to the BLE advertisement source).
-6. `startHttpServer`: listen, then `serving`. SIGINT/SIGTERM sets `not_serving` and closes.
+5. `createHttpServer`, which mounts `/health` itself, with handlers chained via `.route(...)` (and later registered to the BLE advertisement source). Call `health.setNotServing()` on the server if Bluetooth fails.
+6. `.start({ host, port })`: listen, then `serving`. SIGINT/SIGTERM sets `not_serving` and closes.
 
 Web deployments must never restart the collector: BLE advertisements missed while it's down are lost forever.

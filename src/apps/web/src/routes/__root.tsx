@@ -1,11 +1,11 @@
-import '@mantine/core/styles.css'
-import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
-import type { ReactNode } from 'react'
-import type { RouterContext } from '../router'
-import { theme } from './design/theme'
-import { PwaUpdatePrompt } from './features/pwaUpdate/PwaUpdatePrompt'
+import '@mantine/core/styles.css';
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router';
+import type { ReactNode } from 'react';
+import type { RouterContext } from '../router';
+import { theme } from './design/theme';
+import { PwaUpdatePrompt } from './features/pwaUpdate/PwaUpdatePrompt';
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
@@ -23,14 +23,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   }),
   shellComponent: RootDocument,
   component: RootComponent,
-})
+});
 
 type RootDocumentProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 function RootDocument(props: RootDocumentProps) {
-  const { children } = props
+  const { children } = props;
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
@@ -42,11 +42,11 @@ function RootDocument(props: RootDocumentProps) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext()
+  const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme} defaultColorScheme="auto">
@@ -54,5 +54,5 @@ function RootComponent() {
         <PwaUpdatePrompt />
       </MantineProvider>
     </QueryClientProvider>
-  )
+  );
 }
